@@ -1,0 +1,2945 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>MAGICAL FARM SAYAR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    body{
+      background:transparent;background-color:transparent;overflow:hidden;min-height:100vh;
+      display:flex;align-items:center;justify-content:center;
+    }
+
+    :root{
+      --goldBar:#facc15;
+      --goldBar2:#eab308;
+      --panelH: 560px; /* JS günceller */
+    }
+
+    /* ✅ Disabled görünüm (tüm butonlar) */
+    button:disabled{
+      opacity:.45 !important;
+      cursor:not-allowed !important;
+      filter:saturate(.55) !important;
+      box-shadow:none !important;
+      pointer-events:auto;
+    }
+
+    .panel{
+      width:280px;max-height:none;
+      background:
+        radial-gradient(circle at top, rgba(30,64,175,0.35), transparent 60%),
+        radial-gradient(circle at bottom, rgba(76,29,149,0.3), transparent 60%);
+      border-radius:22px;border:1px solid rgba(51,65,85,0.9);
+      box-shadow:0 0 6px rgba(15,23,42,0.9),0 0 10px rgba(30,64,175,0.6);
+      backdrop-filter:blur(8px);
+      padding:30px 12px 12px;color:#e5e7eb;
+      display:flex;flex-direction:column;gap:8px;position:relative;
+      -webkit-app-region:drag;
+    }
+
+    .header-btns{position:absolute;top:6px;right:6px;display:flex;gap:6px;-webkit-app-region:no-drag}
+    .window-btn{
+      width:20px;height:20px;font-size:12px;line-height:18px;text-align:center;border-radius:6px;
+      border:1px solid rgba(148,163,184,0.8);background:rgba(15,23,42,0.85);color:#e5e7eb;
+      cursor:pointer;padding:0;-webkit-app-region:no-drag;
+    }
+    .window-btn:hover{background:rgba(59,130,246,0.6)}
+    .window-btn.close:hover{background:rgba(239,68,68,0.75)}
+
+    .header{
+      position:relative;text-align:center;padding:16px 8px 8px;border-radius:16px;
+      background:linear-gradient(135deg,#4d00ff,#009dff,#7b00ff,#00e7ff);
+      background-size:300% 300%;animation:glowHeader 6s ease infinite;
+      box-shadow:0 0 12px rgba(56,189,248,0.9),0 0 22px rgba(168,85,247,0.9);
+      -webkit-app-region:no-drag;
+    }
+    @keyframes glowHeader{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    .header-title{
+      font-size:14px;font-weight:900;letter-spacing:.24em;color:#e0f2fe;text-transform:uppercase;
+      text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000,0 0 10px rgba(0,0,0,0.8);
+    }
+    .header-sub{
+      font-size:11px;opacity:.9;margin-top:2px;
+      text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;
+    }
+
+    .section-title{
+      font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:#93c5fd;margin-bottom:3px;
+      display:flex;justify-content:center;align-items:center;font-weight:700;text-align:center;
+      text-shadow:0 0 6px rgba(147,197,253,0.8),0 0 10px rgba(139,92,246,0.7);
+    }
+
+    .section{
+      border-radius:14px;background:rgba(15,23,42,0.88);padding:8px 8px 6px;
+      border:1px solid rgba(30,41,59,0.95);box-shadow:0 0 10px rgba(15,23,42,0.9);
+      -webkit-app-region:no-drag;
+    }
+
+    /* ===== Custom Dropdown ===== */
+    .slot-section{
+      background:linear-gradient(135deg,rgba(77,0,255,0.25),rgba(0,157,255,0.28),rgba(123,0,255,0.25));
+      border:1px solid rgba(0,157,255,0.75);
+      box-shadow:0 0 12px rgba(0,157,255,0.5),0 0 18px rgba(123,0,255,0.45);
+      padding:6px 8px;border-radius:12px;display:flex;align-items:center;justify-content:space-between;gap:6px;
+      min-height:15px;-webkit-app-region:no-drag;
+    }
+    .slot-section .section-title{
+      margin:0;padding:0;font-size:11px;font-weight:700;color:#ffffff;white-space:nowrap;letter-spacing:.02em;
+      text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;
+    }
+
+    .dd{position:relative;flex:1;min-width:0;-webkit-app-region:no-drag}
+    .dd.small{flex:0 0 auto;width:42px}
+    .dd-btn{
+      width:100%;height:22px;border-radius:999px;border:1px solid rgba(99,102,241,0.8);
+      background:rgba(15,23,42,0.95);color:#e0f2fe;font-size:11px;padding:0 10px;outline:none;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+      font-weight:700;
+    }
+    .dd.small .dd-btn{padding:0 6px;font-weight:900;letter-spacing:.02em}
+    .dd-btn:focus{border-color:rgba(59,130,246,0.95);box-shadow:0 0 8px rgba(59,130,246,0.55)}
+    .dd-menu{
+      position:absolute;left:0;top:calc(100% + 6px);width:100%;
+      border-radius:12px;border:1px solid rgba(148,163,184,0.35);background:rgba(15,23,42,0.98);
+      box-shadow:0 0 18px rgba(15,23,42,0.75),0 0 18px rgba(59,130,246,0.25);
+      padding:6px;display:none;z-index:60;max-height:190px;overflow:auto;
+    }
+    .dd.open .dd-menu{display:block}
+    .dd-item{
+      width:100%;border-radius:10px;padding:8px 10px;font-size:11px;color:#e5e7eb;cursor:pointer;text-align:center;
+      user-select:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
+    .dd-item:hover{background:rgba(59,130,246,0.22)}
+    .dd-item.active{background:rgba(59,130,246,0.35);border:1px solid rgba(59,130,246,0.35)}
+    .dd-menu::-webkit-scrollbar{width:6px}
+    .dd-menu::-webkit-scrollbar-thumb{background:rgba(148,163,184,0.45);border-radius:999px}
+    .dd-menu::-webkit-scrollbar-track{background:rgba(15,23,42,0.35);border-radius:999px}
+
+    /* ===== Rows / Inputs ===== */
+    .rows{display:flex;flex-direction:column;gap:4px}
+    .row{font-size:11px;align-items:center}
+    .row-bar,.row-header-bar{display:grid;grid-template-columns:1.4fr 0.8fr 0.8fr;gap:3px;align-items:center}
+    .row-item,.row-header-item{display:grid;grid-template-columns:1.6fr 0.8fr 0.8fr 0.8fr;gap:3px;align-items:center}
+
+    .row-header{font-size:11px;opacity:.8;color:#c7d2fe;margin-bottom:2px;padding-right:4px}
+    .row-header span{text-align:center;justify-self:stretch}
+
+    .name-cell{display:flex;align-items:center;justify-content:center;gap:4px;min-width:0}
+    .name-cell span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+    .icon-gold,.icon-silver,.icon-coin{
+      width:11px;height:11px;border-radius:3px;
+      box-shadow:0 0 4px rgba(0,0,0,0.7),0 0 6px rgba(234,179,8,0.6);
+    }
+    .icon-gold{background:linear-gradient(135deg,#facc15,#eab308,#f97316)}
+    .icon-silver{
+      background:linear-gradient(135deg,#e5e7eb,#9ca3af,#6b7280);
+      box-shadow:0 0 4px rgba(0,0,0,0.7),0 0 6px rgba(148,163,184,0.6);
+    }
+    .icon-coin{background:linear-gradient(135deg,#e5d9a8,#d9c88f,#c9b673);box-shadow:none}
+
+    .input-name,.input-qty,.input-price{
+      width:100%;font-size:11px;padding:2px 4px;border-radius:8px;border:1px solid rgba(75,85,99,0.9);
+      background:rgba(15,23,42,0.9);color:#e5e7eb;outline:none;text-align:center;justify-self:stretch;height:22px;line-height:18px;
+    }
+    input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+    input[type=number]{-moz-appearance:textfield}
+    .input-name:focus,.input-qty:focus,.input-price:focus{border-color:rgba(59,130,246,0.95);box-shadow:0 0 8px rgba(59,130,246,0.7)}
+
+    .row-total{width:100%;text-align:center;font-variant-numeric:tabular-nums;color:#bef264;justify-self:stretch}
+
+    .item-buttons{display:flex;gap:6px;margin-top:4px}
+    .btn-add-item,.btn-delete-empty{
+      border-radius:999px;border:1px dashed rgba(148,163,184,0.8);
+      background:rgba(15,23,42,0.8);color:#e5e7eb;cursor:pointer;text-transform:uppercase;letter-spacing:.12em;
+      -webkit-app-region:no-drag;
+    }
+    .btn-add-item{flex:1.4;font-size:10px;padding:3px 0}
+    .btn-delete-empty{flex:1;font-size:8px;padding:3px 0}
+    .btn-add-item:hover{background:rgba(30,64,175,0.9);box-shadow:0 0 10px rgba(59,130,246,0.7)}
+    .btn-delete-empty:hover{background:rgba(190,24,93,0.85);box-shadow:0 0 10px rgba(248,113,113,0.7)}
+
+    .items-rows-scroll{max-height:52px;overflow-y:auto;padding-right:4px}
+    .items-rows-scroll::-webkit-scrollbar{width:6px}
+    .items-rows-scroll::-webkit-scrollbar-thumb{background:rgba(148,163,184,0.45);border-radius:999px}
+    .items-rows-scroll::-webkit-scrollbar-track{background:rgba(15,23,42,0.35);border-radius:999px}
+
+    /* ===== Summary main ===== */
+    .summary{
+      border-radius:16px;
+      background:linear-gradient(135deg,rgba(30,64,175,0.97),rgba(76,29,149,0.97));
+      padding:8px 10px;border:1px solid rgba(165,180,252,0.9);
+      box-shadow:0 0 18px rgba(30,64,175,0.75),0 0 24px rgba(76,29,149,0.75);
+      display:flex;flex-direction:column;gap:4px;
+      -webkit-app-region:no-drag;
+    }
+    .summary-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:0 4px}
+    .summary-total{
+      font-size:16px;font-weight:900;color:var(--goldBar);
+      text-shadow:none;letter-spacing:.02em;
+    }
+    .summary,.summary *{
+      text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;
+    }
+    #perPerson{color:var(--goldBar);font-weight:800;font-variant-numeric:tabular-nums}
+    .summary-sub{font-variant-numeric:tabular-nums}
+    .summary input{
+      width:70px;font-size:11px;padding:1px 4px;border-radius:8px;border:1px solid rgba(30,64,175,0.95);
+      background:rgba(15,23,42,0.95);color:#e5e7eb;outline:none;text-align:right;height:20px;line-height:18px;
+    }
+    .summary input:focus{border-color:rgba(59,130,246,0.95);box-shadow:0 0 8px rgba(59,130,246,0.7)}
+    .party-inline{
+      width:32px !important;padding:0 !important;text-align:center !important;height:20px !important;line-height:20px !important;
+      font-size:10px !important;display:flex;align-items:center;justify-content:center;transform: translateY(1px);
+      border-radius:999px !important;
+    }
+    .party-inline[readonly]{cursor:default}
+
+    .participants-actions{
+      display:grid;grid-template-columns:0.92fr 1.08fr;gap:6px;margin-top:6px;padding:0 4px;
+    }
+    .btn-participants,.btn-participants-edit{
+      width:100%;font-size:8.5px;padding:4px 0;border-radius:999px;cursor:pointer;text-transform:uppercase;letter-spacing:.12em;
+      border:1px dashed rgba(148,163,184,0.85);background:rgba(15,23,42,0.8);color:#e5e7eb;
+      display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;
+      -webkit-app-region:no-drag;
+    }
+    .btn-participants:hover{box-shadow:0 0 10px rgba(56,189,248,0.65)}
+    .btn-participants-edit:hover{box-shadow:0 0 10px rgba(168,85,247,0.65)}
+
+    .edit-pill{display:inline-flex;align-items:center;gap:6px}
+    .edit-pill .divider{width:1px;height:12px;background:rgba(148,163,184,0.6);border-radius:999px;margin:0 2px}
+    .ico{width:12px;height:12px;display:inline-block}
+    .ico svg{width:12px;height:12px;display:block}
+
+    /* ===== Timer ===== */
+    .timer{
+      margin-top:2px;border-radius:14px;background:rgba(15,23,42,0.92);
+      border:1px solid rgba(56,189,248,0.7);
+      padding:6px 8px;
+      display:grid;grid-template-columns:1.1fr 0.9fr;column-gap:6px;align-items:center;
+      -webkit-app-region:no-drag;
+    }
+    .timer-left{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding-left:2px}
+    .timer-left .label{
+      width:100%;font-size:9px;text-transform:uppercase;letter-spacing:.16em;color:#c7d2fe;text-align:left;opacity:.95;padding-left:15px;
+    }
+    .timer-left .value{
+      font-family:ui-monospace,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+      font-size:15px;font-weight:700;letter-spacing:.1em;color:#e0f2fe;text-shadow:0 0 8px rgba(56,189,248,0.65);
+      padding-left:11px;
+    }
+    .timer-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding-right:15px}
+    .datetime{font-size:9px;color:#7dd3fc;letter-spacing:.12em;white-space:nowrap;opacity:.95;text-align:left;padding-left:4px}
+    .timer-controls{display:flex;gap:8px;justify-content:flex-end}
+    .tbtn{
+      width:26px;height:26px;border-radius:999px;border:1px solid rgba(148,163,184,0.9);
+      background:rgba(15,23,42,0.9);color:#e5e7eb;cursor:pointer;display:flex;align-items:center;justify-content:center;
+      padding:0;line-height:0;-webkit-app-region:no-drag;
+    }
+    .tbtn svg{width:14px;height:14px;display:block;transform:translateY(-0.5px)}
+    .tbtn:hover{box-shadow:0 0 8px rgba(56,189,248,0.55)}
+    .tbtn.start{border-color:rgba(34,197,94,0.9)}
+    .tbtn.pause{border-color:rgba(249,115,22,0.9)}
+    .tbtn.reset{border-color:rgba(239,68,68,0.9)}
+    .tbtn.start svg{transform:translate(0.7px,-0.5px)}
+
+    .finish{margin-top:4px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+    .btn-start-farm,.btn-finish,.btn-reset-slot,.btn-reset-all{
+      flex:1;font-size:9px;padding:5px 0;border-radius:999px;cursor:pointer;text-transform:uppercase;
+      letter-spacing:.16em;text-align:center;border:1px solid transparent;-webkit-app-region:no-drag;
+    }
+    .btn-start-farm{
+      border-color:rgba(52,211,153,0.9);
+      background:linear-gradient(135deg,#064e3b,#059669,#10b981);
+      color:#ecfdf5;
+      box-shadow:0 0 10px rgba(52,211,153,0.7),0 0 16px rgba(16,185,129,0.7);
+    }
+    .btn-start-farm:hover{filter:brightness(1.07)}
+    .btn-finish{
+      border-color:rgba(249,168,212,0.9);
+      background:linear-gradient(135deg,#7c2d12,#9f1239,#7c2d12);
+      color:#fee2e2;box-shadow:0 0 10px rgba(248,113,113,0.7),0 0 16px rgba(168,85,247,0.7);
+    }
+    .btn-finish:hover{filter:brightness(1.07)}
+    .btn-reset-slot{
+      border-color:rgba(96,165,250,0.9);
+      background:linear-gradient(135deg,#0f172a,#1d4ed8,#0369a1);
+      color:#e0f2fe;box-shadow:0 0 8px rgba(59,130,246,0.7),0 0 14px rgba(56,189,248,0.5);
+    }
+    .btn-reset-slot:hover{filter:brightness(1.07)}
+    .btn-reset-all{
+      border-color:rgba(71,85,105,0.9);
+      background:linear-gradient(135deg,#0f172a,#64748b,#334155);
+      color:#fffbeb;
+      box-shadow:0 0 10px rgba(71,85,105,0.7),0 0 16px rgba(30,41,59,0.6);
+      white-space:normal;
+    }
+    .btn-reset-all:hover{filter:brightness(1.07)}
+
+    .bump{animation:bump .16s ease-out}
+    @keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.07)}100%{transform:scale(1)}}
+
+    /* ===== Summary Popup (Finish) ===== */
+    .summary-overlay{
+      position:fixed;inset:0;background:transparent;display:none;align-items:center;justify-content:center;
+      z-index:50;pointer-events:auto;-webkit-app-region:no-drag;
+    }
+    .summary-box{
+      width:280px;max-width:92vw;
+      max-height:var(--panelH);
+      background:radial-gradient(circle at top, rgba(30,64,175,0.96), rgba(15,23,42,0.98));
+      border-radius:20px;border:1px solid rgba(191,219,254,0.9);
+      box-shadow:0 0 18px rgba(59,130,246,0.9),0 0 30px rgba(76,29,149,0.9);
+      padding:10px 12px 10px;display:flex;flex-direction:column;gap:6px;font-size:11px;color:#e5e7eb;
+    }
+    .summary-box-header{position:relative;display:flex;justify-content:center;align-items:center;margin-bottom:4px}
+    .summary-box-title{
+      font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#bfdbfe;
+      text-shadow:0 0 8px rgba(15,23,42,0.9),0 0 12px rgba(56,189,248,0.8);
+    }
+    .close-summary{
+      font-size:10px;padding:2px 8px;border-radius:999px;border:1px solid rgba(148,163,184,0.9);
+      background:rgba(15,23,42,0.9);color:#e5e7eb;cursor:pointer;position:absolute;right:1px;top:1px;
+      -webkit-app-region:no-drag;
+    }
+    .close-summary:hover{box-shadow:0 0 8px rgba(148,163,184,0.8)}
+    .summary-line{font-variant-numeric:tabular-nums}
+    .summary-line strong{color:#fef9c3}
+    .summary-scroll{max-height:calc(var(--panelH) - 170px);overflow-y:auto;padding:0 6px 0 10px;line-height:1.5;position:relative}
+    .summary-scroll::-webkit-scrollbar{width:6px}
+    .summary-scroll::-webkit-scrollbar-thumb{background:rgba(148,163,184,0.5);border-radius:999px}
+    .summary-scroll::-webkit-scrollbar-track{background:rgba(15,23,42,0.4);border-radius:999px}
+    .summary-fixed{border-top:1px solid rgba(148,163,184,0.4);padding:6px 6px 0 10px;line-height:1.5}
+
+    .slot-sticky{
+      position:sticky;top:0;z-index:5;padding:6px 6px;margin:8px -6px 4px -10px;border-radius:10px;
+      background:rgba(15,23,42,0.78);backdrop-filter:blur(6px);
+      border:1px solid rgba(148,163,184,0.25);box-shadow:0 0 10px rgba(15,23,42,0.55);
+      display:flex;flex-direction:column;align-items:center;text-align:center;
+    }
+    .slot-sticky .summary-group-title{margin:0;color:#bfdbfe;font-size:10px;letter-spacing:.14em;text-shadow:0 0 10px rgba(56,189,248,0.35);text-align:center}
+    .slot-sticky-divider{height:1px;margin-top:5px;width:100%;background:linear-gradient(90deg,transparent,rgba(148,163,184,0.55),transparent);opacity:.9}
+
+    .sum-gold,.overall-gold{color:var(--goldBar);font-weight:900;text-shadow:none}
+    .overall-gold{font-size:13px}
+    .overall-per{color:var(--goldBar);font-weight:800;text-shadow:none}
+
+    .overall-box{
+      margin-top:6px;padding:8px 8px;border-radius:14px;border:1px solid rgba(148,163,184,0.45);
+      background:rgba(15,23,42,0.78);box-shadow:0 0 10px rgba(15,23,42,0.55);
+    }
+    .overall-box .overall-title{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#cbd5e1;text-align:center;margin-bottom:6px;opacity:.95}
+    .overall-box .overall-content{padding-left:6px}
+    .overall-divider{height:1px;margin:7px 0 6px;width:100%;background:linear-gradient(90deg,transparent,rgba(148,163,184,0.55),transparent);opacity:.9}
+    .overall-time-title{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#cbd5e1;text-align:center;margin:0 0 4px;opacity:.95}
+    .overall-time-value{text-align:center;font-weight:900;color:#e5e7eb}
+
+    .btn-slot-participants{
+      width:100%;margin-top:8px;font-size:9px;padding:5px 0;border-radius:999px;cursor:pointer;text-transform:uppercase;letter-spacing:.14em;
+      border:1px dashed rgba(148,163,184,0.8);background:rgba(15,23,42,0.82);color:#e5e7eb;-webkit-app-region:no-drag;
+    }
+    .btn-slot-participants:hover{box-shadow:0 0 10px rgba(56,189,248,0.55)}
+
+    /* Participants overlays */
+    .p-overlay{
+      position:fixed;inset:0;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;
+      z-index:80;pointer-events:auto;-webkit-app-region:no-drag;
+    }
+/* ✅ Tarih filtresi popup'ı her şeyin üstünde olsun */
+#dateFilterOverlay{
+  z-index: 120;
+}
+
+    .p-box{
+      width:280px;max-height:var(--panelH);
+      background:radial-gradient(circle at top, rgba(30,64,175,0.95), rgba(15,23,42,0.98));
+      border-radius:18px;border:1px solid rgba(191,219,254,0.85);
+      box-shadow:0 0 18px rgba(59,130,246,0.8),0 0 26px rgba(76,29,149,0.8);
+      padding:10px 12px;display:flex;flex-direction:column;gap:8px;color:#e5e7eb;
+    }
+    .p-head{position:relative;display:flex;justify-content:flex-start;align-items:center;padding-right:56px;margin-bottom:2px}
+    .p-title{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#bfdbfe;text-shadow:0 0 12px rgba(56,189,248,0.45)}
+    .p-close{
+      position:absolute;right:0;top:0;font-size:10px;padding:2px 8px;border-radius:999px;border:1px solid rgba(148,163,184,0.9);
+      background:rgba(15,23,42,0.9);color:#e5e7eb;cursor:pointer;-webkit-app-region:no-drag;
+    }
+    .p-close:hover{box-shadow:0 0 8px rgba(148,163,184,0.8)}
+    .p-body{max-height:calc(var(--panelH) - 120px);overflow-y:auto;padding-right:4px}
+    .p-body::-webkit-scrollbar{width:6px}
+    .p-body::-webkit-scrollbar-thumb{background:rgba(148,163,184,0.5);border-radius:999px}
+    .p-body::-webkit-scrollbar-track{background:rgba(15,23,42,0.35);border-radius:999px}
+    .p-list{font-size:11px;line-height:1.55;padding:4px 2px}
+    .p-textarea{
+      width:100%;min-height:160px;resize:vertical;font-size:11px;padding:8px;border-radius:12px;border:1px solid rgba(75,85,99,0.9);
+      background:rgba(15,23,42,0.92);color:#e5e7eb;outline:none;-webkit-app-region:no-drag;
+    }
+    .p-textarea:focus{border-color:rgba(59,130,246,0.95);box-shadow:0 0 10px rgba(59,130,246,0.6)}
+    .p-actions{display:flex;gap:8px;margin-top:2px}
+    .p-actions button{
+      flex:1;font-size:10px;padding:6px 0;border-radius:999px;border:1px solid rgba(148,163,184,0.85);
+      background:rgba(15,23,42,0.88);color:#e5e7eb;cursor:pointer;text-transform:uppercase;letter-spacing:.12em;-webkit-app-region:no-drag;
+    }
+    .p-actions button:hover{box-shadow:0 0 10px rgba(56,189,248,0.55)}
+
+    button,input,textarea{ -webkit-app-region:no-drag; }
+
+    .summary-line strong.overall-gold,
+    .summary-line strong.overall-per,
+    .summary-line strong.sum-gold{
+      color: var(--goldBar);
+      text-shadow: none;
+    }
+
+    /* ===== Save / History Buttons (Finish altı) ===== */
+    .save-history{
+      margin-top:6px;display:flex;justify-content:center;gap:10px;
+    }
+    .btn-save,.btn-history{
+      min-width:120px;font-size:10px;padding:6px 12px;border-radius:999px;cursor:pointer;text-transform:uppercase;letter-spacing:.14em;
+      border:1px dashed rgba(148,163,184,0.85);background:rgba(15,23,42,0.85);color:#e5e7eb;-webkit-app-region:no-drag;
+    }
+    .btn-save:hover{box-shadow:0 0 10px rgba(56,189,248,0.55)}
+    .btn-history:hover{box-shadow:0 0 10px rgba(168,85,247,0.55)}
+
+    /* ===== History Overlay ===== */
+    .h-overlay{
+      position:fixed;inset:0;background:rgba(0,0,0,0.55);
+      display:none;align-items:center;justify-content:center;
+      z-index:90;pointer-events:auto;-webkit-app-region:no-drag;
+    }
+    /* ✅ EN: programla aynı */
+    .h-box{
+      width:280px;max-width:92vw;
+height:420px;              /* ✅ SABİT POPUP YÜKSEKLİĞİ */
+  max-height:420px;
+      background:radial-gradient(circle at top, rgba(30,64,175,0.95), rgba(15,23,42,0.98));
+      border-radius:18px;border:1px solid rgba(191,219,254,0.85);
+      box-shadow:0 0 18px rgba(59,130,246,0.8),0 0 26px rgba(76,29,149,0.8);
+      padding:10px 12px;display:flex;flex-direction:column;gap:8px;color:#e5e7eb;
+    }
+    .h-head{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start; /* ✅ kapat butonu kaydırmasın */
+  padding-right:0;            /* ✅ eski sağ boşluğu iptal */
+}
+/* ✅ Farm Geçmişi başlığı: Kapat butonu olsa bile tam ortada */
+.h-head .h-title{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  width:max-content;
+  text-align:center;
+  pointer-events:none;
+}
+
+/* Kapat sağda sabit kalsın */
+.h-head .h-close{
+  margin-left:auto;
+  position:relative;
+  z-index:2;
+}
+
+/* Sol taraftaki filtre butonu normal yerinde kalsın */
+.h-head .h-filter{
+  position:relative;
+  z-index:2;
+}
+
+
+    /* tarih filtresi ikonu */
+    .h-filter{
+      position:absolute;
+      left:0;
+      top:0;
+
+      width:24px;
+      height:24px;
+      border-radius:6px;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      border:1px solid rgba(148,163,184,0.5);
+      background:rgba(15,23,42,0.85);
+      color:#c7d2fe;
+
+      cursor:pointer;
+      -webkit-app-region:no-drag;
+    }
+
+    .h-filter:hover{
+      box-shadow:0 0 8px rgba(56,189,248,0.6);
+    }
+
+    .h-filter svg{
+      width:14px;
+      height:14px;
+      display:block;
+    }
+
+    .h-title{font-size:12px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#bfdbfe;text-shadow:0 0 12px rgba(56,189,248,0.45)}
+    .h-close{
+      position:absolute;right:0;top:0;font-size:10px;padding:2px 8px;border-radius:999px;
+      border:1px solid rgba(148,163,184,0.9);background:rgba(15,23,42,0.9);color:#e5e7eb;cursor:pointer;
+    }
+    .h-close:hover{box-shadow:0 0 8px rgba(148,163,184,0.8)}
+
+    /* ✅✅ NEW: Aktif filtre etiketi (header altı) */
+    .h-filterbar{
+      display:none;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      padding:6px 8px;
+      border-radius:12px;
+      border:1px dashed rgba(148,163,184,0.35);
+      background:rgba(15,23,42,0.55);
+      box-shadow:0 0 10px rgba(15,23,42,0.35);
+      -webkit-app-region:no-drag;
+    }
+    .h-filterbar.show{display:flex}
+    .h-filtertext{
+      font-size:10px;
+      letter-spacing:.10em;
+      color:#c7d2fe;
+      text-transform:uppercase;
+      font-weight:900;
+      text-align:center;
+    }
+    .h-filterclear{
+      width:22px;height:22px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,0.28);
+      background:rgba(15,23,42,0.65);
+      color:#ffffff;
+      cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      transition:background .15s ease, box-shadow .15s ease, transform .12s ease;
+      -webkit-app-region:no-drag;
+    }
+    .h-filterclear:hover{
+      background:rgba(220,38,38,0.85);
+      box-shadow:0 0 8px rgba(220,38,38,0.55);
+      transform:scale(1.05);
+    }
+    .h-filterclear svg{width:12px;height:12px;display:block}
+
+    .h-body{
+  flex:1;                    /* ✅ kalan alanı doldursun */
+  overflow-y:auto;           /* ✅ sadece dikey scroll */
+  padding-right:4px;
+}
+    .h-body::-webkit-scrollbar{width:6px}
+    .h-body::-webkit-scrollbar-thumb{background:rgba(148,163,184,0.5);border-radius:999px}
+    .h-body::-webkit-scrollbar-track{background:rgba(15,23,42,0.35);border-radius:999px}
+
+    .h-btn{
+      width:100%;
+      border:1px solid rgba(148,163,184,0.35);
+      background:rgba(15,23,42,0.78);
+      border-radius:14px;
+      box-shadow:0 0 10px rgba(15,23,42,0.55);
+      cursor:pointer;
+      color:#e5e7eb;
+
+      display:flex;
+      align-items:stretch;
+      overflow:hidden;
+
+      padding:4px 6px;
+    }
+
+    .h-btn:hover{box-shadow:0 0 12px rgba(56,189,248,0.35)}
+
+    .h-content{
+      flex:1;
+      padding:6px 6px 6px 4px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:3px;
+      min-width:0;
+    }
+    .h-name{
+      font-weight:900;
+      letter-spacing:.06em;
+      font-size:11px;
+      line-height:1.1;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .h-meta{
+      font-size:10px;
+      line-height:1.2;
+      opacity:.92;
+      letter-spacing:.04em;
+    }
+
+    .h-gold{color:var(--goldBar);text-shadow:none;font-weight:900}
+
+    /* pay durumu ikonu (çöp butonunun solunda) */
+    .h-status{
+      flex:0 0 22px;
+      width:22px;
+      height:22px;
+
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      padding:0;
+      line-height:0;
+
+      border-radius:50%;
+      border:1px solid rgba(255,255,255,0.32);
+      background:rgba(15,23,42,0.55);
+
+      align-self:center;
+      margin-right:6px;
+    }
+
+    .h-status.ok{
+      border-color: rgba(34,197,94,0.65);
+      box-shadow: 0 0 8px rgba(34,197,94,0.28);
+    }
+    .h-status.no{
+      border-color: rgba(239,68,68,0.65);
+      box-shadow: 0 0 8px rgba(239,68,68,0.22);
+    }
+
+    .h-status svg{
+      position:absolute;
+      left:50%;
+      top:50%;
+      transform:translate(-50%,-50%);
+      width:14px;
+      height:14px;
+      display:block;
+    }
+
+    /* ✅ ikon rengi */
+    .h-status.ok svg{ color:#86efac; }
+    .h-status.no svg{ color:#fecaca; }
+
+    /* sağdaki çöp butonu */
+    .h-trash{
+      flex:0 0 28px;
+      width:28px;
+      height:28px;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      border-radius:50%;
+      border:1px solid rgba(255,255,255,0.32);
+
+      background:rgba(15,23,42,0.65);
+      color:#ffffff;
+
+      cursor:pointer;
+
+      align-self:center;
+
+      transition:
+        background .15s ease,
+        box-shadow .15s ease,
+        transform .12s ease;
+    }
+
+    .h-trash:hover{
+      background:rgba(220,38,38,0.85);
+      box-shadow:0 0 8px rgba(220,38,38,0.55);
+      transform:scale(1.05);
+    }
+
+    .h-trash svg{
+      width:13px;
+      height:13px;
+      display:block;
+    }
+
+    .h-top{display:none;}
+
+    /* ===== Save Preview Overlay (New) ===== */
+    .s-overlay{
+      position:fixed;inset:0;background:rgba(0,0,0,0.55);
+      display:none;align-items:center;justify-content:center;
+      z-index:95;pointer-events:auto;-webkit-app-region:no-drag;
+    }
+    .s-box{
+      width:280px;max-width:92vw;max-height:var(--panelH);
+      background:radial-gradient(circle at top, rgba(30,64,175,0.95), rgba(15,23,42,0.98));
+      border-radius:18px;border:1px solid rgba(191,219,254,0.85);
+      box-shadow:0 0 18px rgba(59,130,246,0.8),0 0 26px rgba(76,29,149,0.8);
+      padding:10px 12px;display:flex;flex-direction:column;gap:8px;color:#e5e7eb;
+    }
+    .s-head{position:relative;display:flex;align-items:center;justify-content:center;padding-right:64px}
+/* ✅ History Detail başlığı: Kapat butonu olsa bile tam ortada dursun */
+#historyDetailOverlay .s-head{
+  justify-content:flex-start; /* içerik akışını bozmamak için */
+  padding-right:0;           /* eski sağ boşluğu iptal */
+}
+
+#historyDetailOverlay .s-head > div{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  width:100%;
+  pointer-events:none;       /* başlığa tıklayınca kapat butonu engellenmesin */
+}
+
+#historyDetailOverlay .s-head > div *{
+  pointer-events:none;
+}
+
+#historyDetailOverlay #historyDetailClose{
+  margin-left:auto;          /* kapat sağda dursun */
+  position:relative;         /* normal akışta kalsın */
+  z-index:2;                 /* her zaman üstte */
+}
+
+    .s-title{font-size:12px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#bfdbfe;text-shadow:0 0 12px rgba(56,189,248,0.45)}
+    .s-close{
+      position:absolute;right:0;top:0;font-size:10px;padding:2px 8px;border-radius:999px;
+      border:1px solid rgba(148,163,184,0.9);background:rgba(15,23,42,0.9);color:#e5e7eb;cursor:pointer;
+    }
+    .s-close:hover{box-shadow:0 0 8px rgba(148,163,184,0.8)}
+    .s-body{overflow:auto;max-height:calc(var(--panelH) - 170px);padding-right:4px}
+    .s-body::-webkit-scrollbar{width:6px}
+    .s-body::-webkit-scrollbar-thumb{background:rgba(148,163,184,0.5);border-radius:999px}
+    .s-body::-webkit-scrollbar-track{background:rgba(15,23,42,0.35);border-radius:999px}
+
+    .s-sticky{
+      position:sticky;top:0;z-index:5;padding:8px 8px;margin:8px 0 6px;border-radius:12px;
+      background:rgba(15,23,42,0.78);backdrop-filter:blur(6px);
+      border:1px solid rgba(148,163,184,0.25);box-shadow:0 0 10px rgba(15,23,42,0.55);
+      text-align:center;
+    }
+    .s-sticky .tt{font-size:10px;letter-spacing:.14em;color:#bfdbfe;font-weight:900;text-transform:uppercase}
+    .s-subtitle{
+      margin-top:-2px;
+      font-size:10px;
+      letter-spacing:.08em;
+      color:#c7d2fe;
+      text-align:center;
+      opacity:.95;
+      text-transform:uppercase;
+    }
+
+    .s-line{font-size:11px;line-height:1.55;font-variant-numeric:tabular-nums}
+    .s-line strong{color:#fef9c3}
+    .s-line .gold{color:var(--goldBar);text-shadow:none;font-weight:900}
+
+    .s-people{
+      margin-top:6px;border:1px solid rgba(148,163,184,0.25);border-radius:12px;padding:8px;background:rgba(15,23,42,0.55)
+    }
+    .s-people .phead{display:flex;justify-content:space-between;align-items:center;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#c7d2fe;margin-bottom:6px}
+    .dist-head{
+      display:grid;
+      grid-template-columns:1.6fr 0.7fr 0.7fr;
+      gap:6px;
+      font-size:10px;
+      letter-spacing:.10em;
+      text-transform:uppercase;
+      color:#bfdbfe;
+      opacity:.95;
+      padding:6px 6px;
+      border:1px dashed rgba(148,163,184,0.25);
+      border-radius:10px;
+      background:rgba(15,23,42,0.45);
+      margin-bottom:6px;
+    }
+    .dist-row{
+      display:grid;
+      grid-template-columns:1.6fr 0.7fr 0.7fr;
+      gap:6px;
+      align-items:center;
+      padding:6px 6px;
+      border-radius:10px;
+      border:1px solid rgba(148,163,184,0.14);
+      background:rgba(15,23,42,0.35);
+      margin-bottom:6px;
+    }
+    .dist-row:last-child{margin-bottom:0}
+    .dist-name{
+      font-size:11px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      opacity:.95;
+    }
+    .dist-cell{
+      display:flex;align-items:center;justify-content:center;
+    }
+    .s-check{width:16px;height:16px;accent-color:#22c55e;}
+
+    .s-actions{display:flex;gap:10px;margin-top:2px}
+    .s-actions button{
+      flex:1;font-size:10px;padding:7px 0;border-radius:999px;border:1px dashed rgba(148,163,184,0.75);
+      background:rgba(15,23,42,0.88);color:#e5e7eb;cursor:pointer;text-transform:uppercase;letter-spacing:.12em;
+    }
+    .s-actions button:hover{box-shadow:0 0 10px rgba(56,189,248,0.45)}
+    .s-actions .danger:hover{box-shadow:0 0 10px rgba(248,113,113,0.55)}
+
+    .confirm-note{font-size:11px; line-height:1.6; color:#e5e7eb;}
+
+    /* ===== In-app Toast (site alert yerine) ===== */
+    .toast{
+      position:fixed;
+      left:50%;
+      top:50%;
+      transform:translate(-50%, -50%) scale(.98);
+      width:min(260px, calc(100vw - 28px));
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(191,219,254,0.85);
+      background:radial-gradient(circle at top, rgba(30,64,175,0.96), rgba(15,23,42,0.98));
+      box-shadow:0 0 18px rgba(59,130,246,0.75), 0 0 26px rgba(76,29,149,0.75);
+      color:#e5e7eb;
+      font-size:11px;
+      line-height:1.35;
+      letter-spacing:.04em;
+      text-align:center;
+      opacity:0;
+      pointer-events:none;
+      z-index:999;
+      -webkit-app-region:no-drag;
+    }
+
+    .toast.show{
+      opacity:1;
+      transform:translate(-50%, -50%) scale(1);
+      transition:opacity .18s ease, transform .18s ease;
+    }
+
+    .toast.hide{
+      opacity:0;
+      transform:translate(-50%, -50%) scale(.98);
+      transition:opacity .18s ease, transform .18s ease;
+    }
+
+    .toast.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(0);
+      transition:opacity .18s ease, transform .18s ease;
+    }
+    .toast.hide{
+      opacity:0;
+      transform:translateX(-50%) translateY(18px);
+      transition:opacity .18s ease, transform .18s ease;
+    }
+    .toast .t-title{
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color:#bfdbfe;
+      margin-bottom:4px;
+      text-shadow:0 0 10px rgba(56,189,248,0.35);
+    }
+    .toast .t-msg{ font-weight:800; }
+    .toast.ok{ border-color: rgba(52,211,153,0.7); }
+    .toast.ok .t-msg{ color: #86efac; }
+    .toast.warn{ border-color: rgba(251,191,36,0.65); }
+    .toast.warn .t-msg{ color: var(--goldBar); text-shadow:none; }
+    .toast.err{ border-color: rgba(248,113,113,0.75); }
+    .toast.err .t-msg{ color:#fecaca; }
+
+    /* =======================
+       ✅✅ NEW: TARİH FİLTRE POPUP (program içi)
+       ======================= */
+    .df-sub{
+      font-size:10px;opacity:.92;color:#c7d2fe;letter-spacing:.06em;line-height:1.4
+    }
+    .df-grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:8px;
+      margin-top:4px;
+    }
+    .df-field{
+      border:1px solid rgba(148,163,184,0.25);
+      background:rgba(15,23,42,0.55);
+      border-radius:12px;
+      padding:8px;
+      box-shadow:0 0 10px rgba(15,23,42,0.35);
+    }
+    .df-label{
+      font-size:10px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color:#bfdbfe;
+      font-weight:900;
+      margin-bottom:6px;
+      text-align:center;
+    }
+    .df-input{
+      width:100%;
+      height:28px;
+      border-radius:999px;
+      border:1px solid rgba(59,130,246,0.55);
+      background:rgba(15,23,42,0.92);
+      color:#e5e7eb;
+      outline:none;
+      font-size:11px;
+      text-align:center;
+      letter-spacing:.08em;
+      padding:0 10px;
+    }
+    .df-input:focus{border-color:rgba(59,130,246,0.95);box-shadow:0 0 10px rgba(59,130,246,0.45)}
+    .df-hint{
+      margin-top:6px;
+      font-size:10px;
+      opacity:.9;
+      color:#cbd5e1;
+      text-align:center;
+    }
+    .df-quick{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+      margin-top:2px;
+    }
+    .df-qbtn{
+      font-size:10px;
+      padding:7px 0;
+      border-radius:999px;
+      border:1px dashed rgba(148,163,184,0.65);
+      background:rgba(15,23,42,0.82);
+      color:#e5e7eb;
+      cursor:pointer;
+      text-transform:uppercase;
+      letter-spacing:.10em;
+    }
+    .df-qbtn:hover{box-shadow:0 0 10px rgba(56,189,248,0.35)}
+    .df-actions{
+      display:flex;
+      gap:10px;
+      margin-top:4px;
+    }
+    .df-actions button{
+      flex:1;
+      font-size:10px;
+      padding:8px 0;
+      border-radius:999px;
+      border:1px dashed rgba(148,163,184,0.75);
+      background:rgba(15,23,42,0.88);
+      color:#e5e7eb;
+      cursor:pointer;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+    }
+    .df-actions button:hover{box-shadow:0 0 10px rgba(56,189,248,0.45)}
+    .df-actions .danger:hover{box-shadow:0 0 10px rgba(248,113,113,0.55)}
+  </style>
+</head>
+
+<body>
+  <div class="panel" id="panelRoot">
+    <div class="header-btns">
+      <button id="minBtn" class="window-btn">—</button>
+      <button id="closeBtn" class="window-btn close">✕</button>
+    </div>
+
+    <div class="header">
+      <div class="header-title">MAGICAL FARM SAYAR</div>
+      <div class="header-sub">Gold / Item / Süre Takip Paneli</div>
+    </div>
+
+    <!-- FARM SLOTU -->
+    <div class="section slot-section">
+      <div class="section-title">FARM SLOTU</div>
+
+      <div class="dd" id="ddSlot">
+        <button type="button" class="dd-btn" id="ddSlotBtn">Seçim Yapılmadı</button>
+        <div class="dd-menu" id="ddSlotMenu"></div>
+      </div>
+
+      <div class="dd small" id="ddNo">
+        <button type="button" class="dd-btn" id="ddNoBtn">1</button>
+        <div class="dd-menu" id="ddNoMenu"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="row-header row-header-bar">
+        <span>Tür</span><span>Adet</span><span>Toplam</span>
+      </div>
+
+      <div class="rows" id="barsRows">
+        <div class="row row-bar" data-row="bar">
+          <div class="name-cell"><span class="icon-gold"></span><span>Gold Bar</span></div>
+          <input type="number" min="0" step="1" placeholder="Adet" class="input-qty" value="0" />
+          <div class="row-total" data-total>0.00</div>
+          <input type="hidden" class="input-price" value="1" />
+        </div>
+
+        <div class="row row-bar" data-row="bar">
+          <div class="name-cell"><span class="icon-silver"></span><span>Silver Bar</span></div>
+          <input type="number" min="0" step="1" placeholder="Adet" class="input-qty" value="0" />
+          <div class="row-total" data-total>0.00</div>
+          <input type="hidden" class="input-price" value="0.1" />
+        </div>
+
+        <div class="row row-bar" data-row="bar">
+          <div class="name-cell"><span class="icon-coin"></span><span>Gold Coin</span></div>
+          <input type="number" min="0" step="1" placeholder="Adet" class="input-qty" value="0" />
+          <div class="row-total" data-total>0.00</div>
+          <input type="hidden" class="input-price" value="0.01" />
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="row-header row-header-item">
+        <span>İtem</span><span>Adet</span><span>Fiyat</span><span>Toplam</span>
+      </div>
+
+      <div class="items-rows-scroll">
+        <div class="rows" id="itemsRows">
+          <div class="row row-item" data-row="item">
+            <input type="text" placeholder="İtem Adı" class="input-name" />
+            <input type="number" min="0" step="1" placeholder="Adet" class="input-qty" />
+            <input type="number" min="0" step="0.01" placeholder="Fiyat" class="input-price" />
+            <div class="row-total" data-total>0.00</div>
+          </div>
+
+          <div class="row row-item" data-row="item">
+            <input type="text" placeholder="İtem Adı" class="input-name" />
+            <input type="number" min="0" step="1" placeholder="Adet" class="input-qty" />
+            <input type="number" min="0" step="0.01" placeholder="Fiyat" class="input-price" />
+            <div class="row-total" data-total>0.00</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="item-buttons">
+        <button class="btn-add-item" id="addItemBtn">+ Yeni İtem Satırı</button>
+        <button class="btn-delete-empty" id="deleteEmptyBtn">Boş Satırları Sil</button>
+      </div>
+    </div>
+
+    <div class="summary">
+      <div class="summary-row">
+        <span>Barlar Toplamı</span>
+        <span id="barsTotal" class="summary-sub">0.00 GB</span>
+      </div>
+      <div class="summary-row">
+        <span>İtemler Toplamı</span>
+        <span id="itemsTotal" class="summary-sub">0.00 GB</span>
+      </div>
+      <div class="summary-row">
+        <strong>Toplam Gelir</strong>
+        <span id="grandTotal" class="summary-total bump">0.00 GB</span>
+      </div>
+      <div class="summary-row">
+        <span>Kişi Başı</span>
+        <input type="number" id="partySize" min="1" step="1" value="1" class="party-inline" readonly />
+        <span id="perPerson">0.00 GB</span>
+      </div>
+
+      <div class="participants-actions">
+        <button class="btn-participants" id="participantsBtn">KATILIMCILAR</button>
+
+        <button class="btn-participants-edit" id="editParticipantsBtn" aria-label="Katılımcı ekle / düzenle">
+          <span>KATILIMCI</span>
+          <span class="edit-pill">
+            <span class="ico" title="Ekle">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                <path d="M12 5v14"></path><path d="M5 12h14"></path>
+              </svg>
+            </span>
+            <span class="divider"></span>
+            <span class="ico" title="Düzenle">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+              </svg>
+            </span>
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <div class="timer">
+      <div class="timer-left">
+        <div class="label">FARM SÜRESİ</div>
+        <div id="timerValue" class="value">00:00:00</div>
+      </div>
+      <div class="timer-right">
+        <div class="datetime" id="dateTimeText">--.--.---- • --:--</div>
+        <div class="timer-controls">
+          <button class="tbtn start" id="startTimer" title="Başlat" aria-label="Başlat">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M8 5v14l11-7z"></path>
+            </svg>
+          </button>
+          <button class="tbtn pause" id="pauseTimer" title="Duraklat" aria-label="Duraklat">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round">
+              <path d="M9 6v12"></path><path d="M15 6v12"></path>
+            </svg>
+          </button>
+          <button class="tbtn reset" id="resetTimer" title="Sıfırla" aria-label="Sıfırla">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6l-1 14H6L5 6"></path>
+              <path d="M10 11v6"></path>
+              <path d="M14 11v6"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="finish">
+      <button class="btn-start-farm" id="startFarmBtn">FARMI<br>BAŞLAT</button>
+      <button class="btn-finish" id="finishBtn" disabled>FARMI<br>BİTİR</button>
+      <button class="btn-reset-slot" id="resetSlotBtn">SLOTU<br>SIFIRLA</button>
+      <button class="btn-reset-all" id="resetAllBtn">SAYACI SIFIRLA</button>
+    </div>
+
+    <div class="save-history">
+      <button class="btn-save" id="saveFarmBtn" disabled>FARMI KAYDET</button>
+      <button class="btn-history" id="farmHistoryBtn">FARM GEÇMİŞİ</button>
+    </div>
+  </div>
+
+  <!-- FARM ÖZETİ (Finish popup) -->
+  <div class="summary-overlay" id="summaryOverlay">
+    <div class="summary-box">
+      <div class="summary-box-header">
+        <span class="summary-box-title">FARM ÖZETİ</span>
+        <button class="close-summary" id="closeSummary">Kapat ✕</button>
+      </div>
+      <div class="summary-scroll" id="summaryScroll"></div>
+      <div class="summary-fixed" id="summaryFixed"></div>
+    </div>
+  </div>
+
+  <!-- Participants list -->
+  <div class="p-overlay" id="pListOverlay" aria-hidden="true">
+    <div class="p-box">
+      <div class="p-head">
+        <span class="p-title">KATILIMCILAR</span>
+        <button class="p-close" id="pListClose">Kapat ✕</button>
+      </div>
+      <div class="p-body">
+        <div class="p-list" id="pListContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Participants edit -->
+  <div class="p-overlay" id="pEditOverlay" aria-hidden="true">
+    <div class="p-box">
+      <div class="p-head">
+        <span class="p-title">KATILIMCILARI DÜZENLE</span>
+        <button class="p-close" id="pEditClose">Kapat ✕</button>
+      </div>
+      <div class="p-body">
+        <div style="font-size:10px; opacity:0.9; color:#c7d2fe; margin-bottom:6px;">
+          Her satıra 1 nick yaz. Boş satırlar kaydedilmez.
+        </div>
+        <textarea class="p-textarea" id="pEditTextarea"></textarea>
+        <div class="p-actions">
+          <button id="pEditSave">Kaydet</button>
+          <button id="pEditCancel">İptal</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slot participants detail (from finish summary) -->
+  <div class="p-overlay" id="pSummaryOverlay" aria-hidden="true">
+    <div class="p-box">
+      <div class="p-head">
+        <span class="p-title" id="pSummaryTitle">KATILIMCI DETAYLARI</span>
+        <button class="p-close" id="pSummaryClose">Kapat ✕</button>
+      </div>
+      <div class="p-body">
+        <div class="p-list" id="pSummaryContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Start farm confirm -->
+  <div class="p-overlay" id="startFarmConfirmOverlay" style="display:none;" aria-hidden="true">
+    <div class="p-box">
+      <div class="p-head">
+        <span class="p-title">FARM YENİDEN BAŞLAT</span>
+        <button class="p-close" id="startFarmConfirmClose">Kapat ✕</button>
+      </div>
+      <div class="confirm-note">
+        Farm zaten çalışıyor.<br>
+        <strong>Yeniden başlatılırsa süre sıfırlanacaktır.</strong><br><br>
+        Emin misin?
+      </div>
+      <div class="p-actions">
+        <button id="startFarmCancel">İptal</button>
+        <button id="startFarmConfirm">Yeniden Başlat</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAVE PREVIEW POPUP -->
+  <div class="s-overlay" id="saveOverlay" aria-hidden="true">
+    <div class="s-box">
+      <div class="s-head">
+        <span class="s-title" id="saveTitle">FARMI KAYDET</span>
+        <button class="s-close" id="saveClose">Kapat ✕</button>
+      </div>
+      <div class="s-body" id="saveBody"></div>
+      <div class="s-actions">
+        <button id="saveConfirmBtn">Kaydet</button>
+        <button class="danger" id="saveCancelBtn">İptal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORY LIST POPUP -->
+  <div class="h-overlay" id="historyOverlay" aria-hidden="true">
+    <div class="h-box">
+      <div class="h-head">
+        <!-- Tarih filtresi -->
+        <button class="h-filter" id="historyDateBtn" title="Tarihe göre filtrele">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+            <line x1="16" y1="2.5" x2="16" y2="6"></line>
+            <line x1="8" y1="2.5" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </button>
+
+        <span class="h-title">FARM GEÇMİŞİ</span>
+        <button class="h-close" id="historyClose">Kapat ✕</button>
+      </div>
+
+      <!-- ✅✅ NEW: Filtre etiketi -->
+      <div class="h-filterbar" id="historyFilterBar">
+        <div class="h-filtertext" id="historyFilterText">FİLTRE: --</div>
+        <button class="h-filterclear" id="historyFilterClear" title="Filtreyi temizle" aria-label="Filtreyi temizle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round">
+            <path d="M18 6L6 18"></path>
+            <path d="M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="h-body" id="historyBody"></div>
+    </div>
+  </div>
+
+  <!-- ✅✅ NEW: TARİH FİLTRESİ POPUP (program içi) -->
+  <div class="p-overlay" id="dateFilterOverlay" aria-hidden="true">
+    <div class="p-box">
+      <div class="p-head">
+        <span class="p-title">TARİH FİLTRESİ</span>
+        <button class="p-close" id="dateFilterClose">Kapat ✕</button>
+      </div>
+
+      <div class="df-sub">
+        Tek gün veya aralık filtreleyebilirsin.<br>
+        Format: <strong>GG.AA.YYYY</strong> (ör: 15.12.2025)
+      </div>
+
+      <div class="df-grid">
+        <div class="df-field">
+          <div class="df-label">BAŞLANGIÇ</div>
+          <input class="df-input" id="dfFrom" placeholder="GG.AA.YYYY" />
+          <div class="df-hint">Tek gün için sadece başlangıç girmen yeter.</div>
+        </div>
+
+        <div class="df-field">
+          <div class="df-label">BİTİŞ</div>
+          <input class="df-input" id="dfTo" placeholder="GG.AA.YYYY (opsiyonel)" />
+          <div class="df-hint">Aralık için bitiş gir (dahil).</div>
+        </div>
+
+        <div class="df-quick">
+          <button class="df-qbtn" id="dfToday">BUGÜN</button>
+          <button class="df-qbtn" id="df7">SON 7 GÜN</button>
+        </div>
+
+        <div class="df-actions">
+          <button id="dfApply">Uygula</button>
+          <button class="danger" id="dfClear">Temizle</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORY DETAIL POPUP -->
+  <div class="s-overlay" id="historyDetailOverlay" aria-hidden="true">
+    <div class="s-box">
+      <div class="s-head">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+          <span class="s-title" id="historyDetailTitleTop">KAYIT DETAYI</span>
+          <span class="s-subtitle" id="historyDetailTitleSub">--</span>
+        </div>
+        <button class="s-close" id="historyDetailClose">Kapat ✕</button>
+      </div>
+      <div class="s-body" id="historyDetailBody"></div>
+      <div class="s-actions">
+        <button id="historyDetailSaveBtn">Güncelle</button>
+        <button class="danger" id="historyDetailDeleteBtn">Sil</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- IN-APP TOAST -->
+  <div class="toast" id="appToast" aria-hidden="true">
+    <div class="t-title" id="toastTitle">BİLGİ</div>
+    <div class="t-msg" id="toastMsg">...</div>
+  </div>
+
+<script>
+/* ================== PANEL HEIGHT (popuplar max-height) ================== */
+const panelRoot = document.getElementById("panelRoot");
+function syncPanelHeightVar(){
+  const h = panelRoot ? panelRoot.offsetHeight : 560;
+  document.documentElement.style.setProperty("--panelH", Math.max(380, h) + "px");
+}
+window.addEventListener("resize", syncPanelHeightVar);
+
+/* ================== DOM ================== */
+const barsRowsEl      = document.getElementById("barsRows");
+const itemsRowsEl     = document.getElementById("itemsRows");
+const addItemBtn      = document.getElementById("addItemBtn");
+const deleteEmptyBtn  = document.getElementById("deleteEmptyBtn");
+
+const barsTotalEl     = document.getElementById("barsTotal");
+const itemsTotalEl    = document.getElementById("itemsTotal");
+const grandTotalEl    = document.getElementById("grandTotal");
+const perPersonEl     = document.getElementById("perPerson");
+const partySizeEl     = document.getElementById("partySize");
+
+const finishBtn       = document.getElementById("finishBtn");
+const startFarmBtn    = document.getElementById("startFarmBtn");
+
+const startFarmConfirmOverlay = document.getElementById("startFarmConfirmOverlay");
+const startFarmConfirmClose   = document.getElementById("startFarmConfirmClose");
+const startFarmCancel         = document.getElementById("startFarmCancel");
+const startFarmConfirm        = document.getElementById("startFarmConfirm");
+
+const resetSlotBtn    = document.getElementById("resetSlotBtn");
+const resetAllBtn     = document.getElementById("resetAllBtn");
+
+const summaryOverlay  = document.getElementById("summaryOverlay");
+const summaryScroll   = document.getElementById("summaryScroll");
+const summaryFixed    = document.getElementById("summaryFixed");
+const closeSummaryBtn = document.getElementById("closeSummary");
+
+const participantsBtn     = document.getElementById("participantsBtn");
+const editParticipantsBtn = document.getElementById("editParticipantsBtn");
+
+const pListOverlay   = document.getElementById("pListOverlay");
+const pListClose     = document.getElementById("pListClose");
+const pListContent   = document.getElementById("pListContent");
+
+const pEditOverlay   = document.getElementById("pEditOverlay");
+const pEditClose     = document.getElementById("pEditClose");
+const pEditTextarea  = document.getElementById("pEditTextarea");
+const pEditSave      = document.getElementById("pEditSave");
+const pEditCancel    = document.getElementById("pEditCancel");
+
+const pSummaryOverlay = document.getElementById("pSummaryOverlay");
+const pSummaryClose   = document.getElementById("pSummaryClose");
+const pSummaryContent = document.getElementById("pSummaryContent");
+const pSummaryTitle   = document.getElementById("pSummaryTitle");
+
+/* Custom dropdown DOM */
+const ddSlot = document.getElementById("ddSlot");
+const ddSlotBtn = document.getElementById("ddSlotBtn");
+const ddSlotMenu = document.getElementById("ddSlotMenu");
+
+const ddNo = document.getElementById("ddNo");
+const ddNoBtn = document.getElementById("ddNoBtn");
+const ddNoMenu = document.getElementById("ddNoMenu");
+
+/* Timer DOM */
+const timerValueEl  = document.getElementById("timerValue");
+const startTimerBtn = document.getElementById("startTimer");
+const pauseTimerBtn = document.getElementById("pauseTimer");
+const resetTimerBtn = document.getElementById("resetTimer");
+const dateTimeTextEl = document.getElementById("dateTimeText");
+
+/* Save/History DOM */
+const saveFarmBtn      = document.getElementById("saveFarmBtn");
+const farmHistoryBtn   = document.getElementById("farmHistoryBtn");
+
+const saveOverlay      = document.getElementById("saveOverlay");
+const saveClose        = document.getElementById("saveClose");
+const saveCancelBtn    = document.getElementById("saveCancelBtn");
+const saveConfirmBtn   = document.getElementById("saveConfirmBtn");
+const saveBody         = document.getElementById("saveBody");
+
+const historyOverlay   = document.getElementById("historyOverlay");
+const historyClose     = document.getElementById("historyClose");
+const historyBody      = document.getElementById("historyBody");
+const historyDateBtn   = document.getElementById("historyDateBtn");
+
+/* ✅✅ NEW: filter bar DOM */
+const historyFilterBar   = document.getElementById("historyFilterBar");
+const historyFilterText  = document.getElementById("historyFilterText");
+const historyFilterClear = document.getElementById("historyFilterClear");
+
+/* ✅✅ NEW: date filter popup DOM */
+const dateFilterOverlay = document.getElementById("dateFilterOverlay");
+const dateFilterClose   = document.getElementById("dateFilterClose");
+const dfFrom            = document.getElementById("dfFrom");
+const dfTo              = document.getElementById("dfTo");
+const dfApply           = document.getElementById("dfApply");
+const dfClear           = document.getElementById("dfClear");
+const dfToday           = document.getElementById("dfToday");
+const df7               = document.getElementById("df7");
+
+const historyDetailOverlay    = document.getElementById("historyDetailOverlay");
+const historyDetailClose      = document.getElementById("historyDetailClose");
+const historyDetailTitleTop   = document.getElementById("historyDetailTitleTop");
+const historyDetailTitleSub   = document.getElementById("historyDetailTitleSub");
+const historyDetailBody       = document.getElementById("historyDetailBody");
+const historyDetailSaveBtn    = document.getElementById("historyDetailSaveBtn");
+const historyDetailDeleteBtn  = document.getElementById("historyDetailDeleteBtn");
+/* ================== IN-APP TOAST ================== */
+const appToast = document.getElementById("appToast");
+const toastTitleEl = document.getElementById("toastTitle");
+const toastMsgEl = document.getElementById("toastMsg");
+let toastTimer = null;
+
+function showToast(msg, type="ok", title="BİLGİ", ms=1600){
+  if (!appToast) return;
+
+  appToast.classList.remove("ok","warn","err","show","hide");
+  appToast.classList.add(type);
+
+  toastTitleEl.textContent = title;
+  toastMsgEl.textContent = msg;
+
+  appToast.style.display = "block";
+  appToast.setAttribute("aria-hidden","false");
+
+  void appToast.offsetWidth;
+  appToast.classList.add("show");
+
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    appToast.classList.remove("show");
+    appToast.classList.add("hide");
+    setTimeout(() => {
+      appToast.style.display = "none";
+      appToast.setAttribute("aria-hidden","true");
+    }, 200);
+  }, ms);
+}
+
+/* ================== SLOT OPTIONS ================== */
+const SLOT_OPTIONS = [
+  { value:"default", label:"Seçim Yapılmadı" },
+  { value:"bahce", label:"Bahçe Farmı" },
+  { value:"bifrost", label:"Bifrost Farmı" },
+  { value:"ewdm", label:"EW & DM Farmı" },
+  { value:"darkdungeon", label:"Dark Dungeon" },
+  { value:"pirate", label:"Dispatched/Elite" },
+  { value:"solo", label:"Solo Farm" },
+];
+const SLOT_LABELS = Object.fromEntries(SLOT_OPTIONS.map(o => [o.value, o.label]));
+
+/* ================== Helpers ================== */
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+function getCompositeKey(baseKey, num){ return `${baseKey || "default"}__${num || "1"}`; }
+function parseCompositeKey(k){
+  const [base, num] = String(k||"default__1").split("__");
+  return { base: base || "default", num: num || "1" };
+}
+function formatSecondsToTime(sec) {
+  const s = Math.max(0, Math.floor(sec || 0));
+  const hours   = String(Math.floor(s / 3600)).padStart(2, "0");
+  const minutes = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
+  const seconds = String(s % 60).padStart(2, "0");
+  return `${hours}:${minutes}:${seconds}`;
+}
+function formatShortDate(ts){
+  if (!ts) return "--.--.--";
+  const d = new Date(ts);
+  const dd = String(d.getDate()).padStart(2,"0");
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  const yy = String(d.getFullYear()).slice(-2);
+  return `${dd}.${mm}.${yy}`;
+}
+function formatHM(ts){
+  if (!ts) return "--:--";
+  const d = new Date(ts);
+  const hh = String(d.getHours()).padStart(2,"0");
+  const mm = String(d.getMinutes()).padStart(2,"0");
+  return `${hh}:${mm}`;
+}
+function safeClone(obj){
+  if (typeof structuredClone === "function") return structuredClone(obj);
+  return JSON.parse(JSON.stringify(obj));
+}
+function uniq(arr){ return Array.from(new Set(arr)); }
+
+/* ================== STATE ================== */
+let currentBase = "default";
+let currentNum  = "1";
+let currentSlotKey = getCompositeKey(currentBase, currentNum);
+
+const slotStates = {};
+const MIN_ITEM_ROWS = 2;
+
+/* Timer runtime (global current slot) */
+let timerSeconds = 0;
+let timerInterval = null;
+
+/* ✅ Kural fonksiyonları */
+function isSlotFinishedAndNonEmpty(st){
+  if (!st) return false;
+  const t = st.totals || {};
+  const timeSec = st.timerSeconds || 0;
+  const nonEmpty = ((t.barsTotal || 0) > 0) || ((t.itemsTotal || 0) > 0) || (timeSec > 0);
+  return !!st.finished && nonEmpty;
+}
+function hasAnyFinishedSlot(){
+  return Object.values(slotStates).some(isSlotFinishedAndNonEmpty);
+}
+function updateButtonsState(){
+  ensureSlotInitialized(currentSlotKey);
+
+  finishBtn.disabled = !slotStates[currentSlotKey].started;
+  saveFarmBtn.disabled = !hasAnyFinishedSlot();
+
+  updateTimerButtonsUI();
+}
+
+/* ✅ slot init: started/finished eklendi */
+function ensureSlotInitialized(key) {
+  if (slotStates[key]) {
+    if (!slotStates[key].dist) slotStates[key].dist = { bars:false, items:false };
+    if (slotStates[key].started == null) slotStates[key].started = false;
+    if (slotStates[key].finished == null) slotStates[key].finished = false;
+    return;
+  }
+  slotStates[key] = {
+    barsQty: [0,0,0],
+    items: [],
+    partySize: 1,
+    timerSeconds: 0,
+    timerRunning: false,
+    startTs: null,
+    endTs: null,
+    started: false,
+    finished: false,
+    totals: { barsTotal: 0, itemsTotal: 0, grandTotal: 0, partySize: 1, perPerson: 0, barsDetails: [], itemsDetails: [] },
+    participants: [],
+    dist: { bars:false, items:false }
+  };
+}
+
+function getSlotParticipants(key) {
+  const s = slotStates[key];
+  return (s && Array.isArray(s.participants)) ? s.participants : [];
+}
+
+function sanitizeParticipantsFromText(text) {
+  return (text || "")
+    .split(/\r?\n/)
+    .map(x => x.trim())
+    .filter(x => x.length > 0);
+}
+
+function syncPartySizeFromParticipants(key = currentSlotKey, alsoRecalc = true) {
+  ensureSlotInitialized(key);
+  const count = getSlotParticipants(key).length;
+  const val = Math.max(1, count || 0);
+  partySizeEl.value = val;
+  slotStates[key].partySize = val;
+  if (alsoRecalc) recalc(true);
+}
+
+function setCurrentParticipants(list) {
+  ensureSlotInitialized(currentSlotKey);
+  slotStates[currentSlotKey].participants = Array.isArray(list) ? list : [];
+  syncPartySizeFromParticipants(currentSlotKey, true);
+}
+
+function createEmptyItemRow() {
+  const row = document.createElement("div");
+  row.className = "row row-item";
+  row.setAttribute("data-row", "item");
+  row.innerHTML = `
+    <input type="text" placeholder="İtem Adı" class="input-name" />
+    <input type="number" min="0" step="1" placeholder="Adet" class="input-qty" />
+    <input type="number" min="0" step="0.01" placeholder="Fiyat" class="input-price" />
+    <div class="row-total" data-total>0.00</div>
+  `;
+  return row;
+}
+
+function ensureMinItemRows() {
+  const rows = itemsRowsEl.querySelectorAll('[data-row="item"]');
+  const need = MIN_ITEM_ROWS - rows.length;
+  if (need > 0) for (let i = 0; i < need; i++) itemsRowsEl.appendChild(createEmptyItemRow());
+}
+
+function getTotalsAndDetails() {
+  let barsTotal = 0;
+  let itemsTotal = 0;
+  const barsDetails = [];
+  const itemsDetails = [];
+
+  barsRowsEl.querySelectorAll('[data-row="bar"]').forEach(row => {
+    const nameEl     = row.querySelector(".name-cell span:last-child");
+    const qtyInput   = row.querySelector(".input-qty");
+    const priceInput = row.querySelector(".input-price");
+    const totalEl    = row.querySelector("[data-total]");
+
+    const name  = (nameEl?.textContent || "").trim() || "Bar";
+    const qty   = parseFloat(qtyInput.value)   || 0;
+    const price = parseFloat(priceInput.value) || 0;
+    const total = qty * price;
+
+    totalEl.textContent = total.toFixed(2);
+    barsTotal += total;
+
+    if (qty > 0 && total > 0) barsDetails.push({ name, qty, price, total });
+  });
+
+  itemsRowsEl.querySelectorAll('[data-row="item"]').forEach(row => {
+    const nameInput  = row.querySelector(".input-name");
+    const qtyInput   = row.querySelector(".input-qty");
+    const priceInput = row.querySelector(".input-price");
+    const totalEl    = row.querySelector("[data-total]");
+
+    const name  = (nameInput?.value || "").trim() || "İsimsiz İtem";
+    const qty   = parseFloat(qtyInput.value)   || 0;
+    const price = parseFloat(priceInput.value) || 0;
+    const total = qty * price;
+
+    totalEl.textContent = total.toFixed(2);
+    itemsTotal += total;
+
+    if (qty > 0 && price > 0 && total > 0) itemsDetails.push({ name, qty, price, total });
+  });
+
+  const grandTotal = barsTotal + itemsTotal;
+  const partySize  = parseFloat(partySizeEl.value) || 1;
+  const perPerson  = partySize > 0 ? grandTotal / partySize : 0;
+
+  return { barsTotal, itemsTotal, grandTotal, partySize, perPerson, barsDetails, itemsDetails };
+}
+
+function recalc(saveState = true) {
+  const t = getTotalsAndDetails();
+
+  barsTotalEl.textContent  = t.barsTotal.toFixed(2)  + " GB";
+  itemsTotalEl.textContent = t.itemsTotal.toFixed(2) + " GB";
+  grandTotalEl.textContent = t.grandTotal.toFixed(2) + " GB";
+  perPersonEl.textContent  = t.perPerson.toFixed(2)  + " GB";
+
+  grandTotalEl.classList.remove("bump");
+  void grandTotalEl.offsetWidth;
+  grandTotalEl.classList.add("bump");
+
+  if (saveState && currentSlotKey) {
+    ensureSlotInitialized(currentSlotKey);
+    slotStates[currentSlotKey].totals = t;
+  }
+
+  updateButtonsState();
+}
+
+function pauseTimerInternal() {
+  if (timerInterval !== null) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+  ensureSlotInitialized(currentSlotKey);
+  slotStates[currentSlotKey].timerRunning = false;
+}
+
+function finalizeSlotOnLeaveIfRunning(key) {
+  if (!key) return;
+  ensureSlotInitialized(key);
+  if (slotStates[key].timerRunning) {
+    slotStates[key].endTs = Date.now();
+    slotStates[key].timerRunning = false;
+  }
+}
+
+function saveCurrentSlotState() {
+  if (!currentSlotKey) return;
+  ensureSlotInitialized(currentSlotKey);
+
+  const t = getTotalsAndDetails();
+
+  const barsQty = [];
+  barsRowsEl.querySelectorAll('[data-row="bar"]').forEach(row => {
+    const qtyInput = row.querySelector(".input-qty");
+    barsQty.push(parseFloat(qtyInput.value) || 0);
+  });
+
+  const items = [];
+  itemsRowsEl.querySelectorAll('[data-row="item"]').forEach(row => {
+    const nameInput  = row.querySelector(".input-name");
+    const qtyInput   = row.querySelector(".input-qty");
+    const priceInput = row.querySelector(".input-price");
+    items.push({
+      name:  nameInput ? (nameInput.value || "") : "",
+      qty:   qtyInput ? (parseFloat(qtyInput.value) || 0) : 0,
+      price: priceInput ? (parseFloat(priceInput.value) || 0) : 0
+    });
+  });
+
+  const prev = slotStates[currentSlotKey];
+  const prevParticipants = Array.isArray(prev.participants) ? prev.participants : [];
+  const prevStartTs = prev.startTs ?? null;
+  const prevEndTs   = prev.endTs ?? null;
+  const prevRunning = !!prev.timerRunning;
+  const prevDist    = prev.dist ? { bars:!!prev.dist.bars, items:!!prev.dist.items } : { bars:false, items:false };
+  const prevStarted = !!prev.started;
+  const prevFinished = !!prev.finished;
+
+  slotStates[currentSlotKey] = {
+    barsQty,
+    items,
+    partySize: parseFloat(partySizeEl.value) || 1,
+    timerSeconds,
+    timerRunning: prevRunning,
+    startTs: prevStartTs,
+    endTs: prevEndTs,
+    started: prevStarted,
+    finished: prevFinished,
+    totals: t,
+    participants: prevParticipants,
+    dist: prevDist
+  };
+}
+
+function applyStateToDOM(state) {
+  const barRows = barsRowsEl.querySelectorAll('[data-row="bar"]');
+  barRows.forEach((row, idx) => {
+    const qtyInput = row.querySelector(".input-qty");
+    if (qtyInput) qtyInput.value = (state.barsQty && state.barsQty[idx] != null) ? state.barsQty[idx] : 0;
+  });
+
+  itemsRowsEl.innerHTML = "";
+  const items = (state.items && state.items.length) ? state.items : [];
+  const normalized = items.slice(0);
+  while (normalized.length < MIN_ITEM_ROWS) normalized.push({ name:"", qty:0, price:0 });
+
+  normalized.forEach(item => {
+    const row = createEmptyItemRow();
+    row.querySelector(".input-name").value  = item.name || "";
+    row.querySelector(".input-qty").value   = item.qty ? item.qty : "";
+    row.querySelector(".input-price").value = item.price ? item.price : "";
+    itemsRowsEl.appendChild(row);
+  });
+
+  timerSeconds = state.timerSeconds || 0;
+  renderTimer();
+  pauseTimerInternal();
+
+  syncPartySizeFromParticipants(currentSlotKey, false);
+  recalc(false);
+  updateButtonsState();
+}
+
+function clearDOMValues() {
+  barsRowsEl.querySelectorAll(".input-qty").forEach(inp => inp.value = 0);
+  itemsRowsEl.innerHTML = "";
+  for (let i = 0; i < MIN_ITEM_ROWS; i++) itemsRowsEl.appendChild(createEmptyItemRow());
+  partySizeEl.value = 1;
+}
+
+function switchToSelectedSlot(newBase, newNum) {
+  finalizeSlotOnLeaveIfRunning(currentSlotKey);
+
+  saveCurrentSlotState();
+  pauseTimerInternal();
+
+  currentBase = newBase || "default";
+  currentNum  = newNum  || "1";
+  currentSlotKey = getCompositeKey(currentBase, currentNum);
+
+  ensureSlotInitialized(currentSlotKey);
+  applyStateToDOM(slotStates[currentSlotKey]);
+  syncPartySizeFromParticipants(currentSlotKey, true);
+  recalc(true);
+  updateButtonsState();
+}
+
+/* ================== Custom Dropdown Logic ================== */
+function closeAllDropdowns(except = null){
+  [ddSlot, ddNo].forEach(d => { if (d !== except) d.classList.remove("open"); });
+}
+function buildDropdownMenu(ddEl, menuEl, options, getValue, setValue){
+  menuEl.innerHTML = "";
+  options.forEach(opt => {
+    const item = document.createElement("div");
+    item.className = "dd-item";
+    item.textContent = opt.label;
+    item.dataset.value = opt.value;
+    if (String(opt.value) === String(getValue())) item.classList.add("active");
+
+    item.addEventListener("click", () => {
+      setValue(opt.value);
+      ddEl.classList.remove("open");
+    });
+    menuEl.appendChild(item);
+  });
+}
+function refreshSlotMenuActive(){
+  ddSlotMenu.querySelectorAll(".dd-item").forEach(el => {
+    el.classList.toggle("active", el.dataset.value === String(currentBase));
+  });
+}
+function refreshNoMenuActive(){
+  ddNoMenu.querySelectorAll(".dd-item").forEach(el => {
+    el.classList.toggle("active", el.dataset.value === String(currentNum));
+  });
+}
+function setSlotBase(v){
+  const found = SLOT_OPTIONS.find(o => o.value === v) || SLOT_OPTIONS[0];
+  ddSlotBtn.textContent = found.label;
+  const old = currentBase;
+  if (String(old) !== String(found.value)) {
+    switchToSelectedSlot(found.value, currentNum);
+  } else {
+    currentBase = found.value;
+    currentSlotKey = getCompositeKey(currentBase, currentNum);
+    ensureSlotInitialized(currentSlotKey);
+  }
+  refreshSlotMenuActive();
+  updateButtonsState();
+}
+function setSlotNum(v){
+  const num = String(v);
+  ddNoBtn.textContent = num;
+  const old = currentNum;
+  if (String(old) !== num) {
+    switchToSelectedSlot(currentBase, num);
+  } else {
+    currentNum = num;
+    currentSlotKey = getCompositeKey(currentBase, currentNum);
+    ensureSlotInitialized(currentSlotKey);
+  }
+  refreshNoMenuActive();
+  updateButtonsState();
+}
+
+function updateTimerButtonsUI(){
+  ensureSlotInitialized(currentSlotKey);
+
+  const started  = slotStates[currentSlotKey].started;
+  const finished = slotStates[currentSlotKey].finished;
+
+  const disabled = !started || finished;
+
+  startTimerBtn.disabled = disabled;
+  pauseTimerBtn.disabled = disabled;
+  resetTimerBtn.disabled = disabled;
+}
+
+function initDropdowns(){
+  buildDropdownMenu(ddSlot, ddSlotMenu, SLOT_OPTIONS.map(o => ({value:o.value, label:o.label})), () => currentBase, (val) => setSlotBase(val));
+  const nums = [1,2,3,4,5].map(n => ({value:String(n), label:String(n)}));
+  buildDropdownMenu(ddNo, ddNoMenu, nums, () => currentNum, (val) => setSlotNum(val));
+
+  ddSlotBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const willOpen = !ddSlot.classList.contains("open");
+    closeAllDropdowns(ddSlot);
+    ddSlot.classList.toggle("open", willOpen);
+  });
+
+  ddNoBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const willOpen = !ddNo.classList.contains("open");
+    closeAllDropdowns(ddNo);
+    ddNo.classList.toggle("open", willOpen);
+  });
+
+  document.addEventListener("click", () => closeAllDropdowns());
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeAllDropdowns(); });
+
+  setSlotBase(currentBase);
+  setSlotNum(currentNum);
+}
+
+/* ================== Inputs / Buttons ================== */
+[barsRowsEl, itemsRowsEl].forEach(el => el.addEventListener("input", () => recalc()));
+
+addItemBtn.addEventListener("click", () => { itemsRowsEl.appendChild(createEmptyItemRow()); });
+
+deleteEmptyBtn.addEventListener("click", () => {
+  itemsRowsEl.querySelectorAll('[data-row="item"]').forEach(row => {
+    const nameInput  = row.querySelector(".input-name");
+    const qtyInput   = row.querySelector(".input-qty");
+    const priceInput = row.querySelector(".input-price");
+    const emptyName  = !nameInput.value.trim();
+    const emptyQty   = !qtyInput.value.trim();
+    const emptyPrice = !priceInput.value.trim();
+    if (emptyName && emptyQty && emptyPrice) row.remove();
+  });
+  ensureMinItemRows();
+  recalc();
+});
+
+/* QoL: 0 yazıyken tıklayınca sil */
+document.addEventListener("focusin", (e) => {
+  if (e.target.classList && e.target.classList.contains("input-qty")) {
+    if (e.target.value === "0") e.target.value = "";
+  }
+});
+
+/* ================== TIMER ================== */
+function renderTimer() { timerValueEl.textContent = formatSecondsToTime(timerSeconds); }
+
+function openStartFarmConfirm() {
+  startFarmConfirmOverlay.style.display = "flex";
+  startFarmConfirmOverlay.setAttribute("aria-hidden", "false");
+}
+function closeStartFarmConfirm() {
+  startFarmConfirmOverlay.style.display = "none";
+  startFarmConfirmOverlay.setAttribute("aria-hidden", "true");
+}
+startFarmConfirmClose.addEventListener("click", closeStartFarmConfirm);
+startFarmCancel.addEventListener("click", closeStartFarmConfirm);
+startFarmConfirm.addEventListener("click", () => { closeStartFarmConfirm(); startTimerInternal(true); });
+startFarmConfirmOverlay.addEventListener("click", (e) => { if (e.target === startFarmConfirmOverlay) closeStartFarmConfirm(); });
+
+function startTimerInternal(reset = false){
+  ensureSlotInitialized(currentSlotKey);
+
+  if (!reset && !slotStates[currentSlotKey].started) return;
+
+  if (reset) {
+    pauseTimerInternal();
+    timerSeconds = 0;
+    renderTimer();
+    slotStates[currentSlotKey].timerSeconds = 0;
+    slotStates[currentSlotKey].startTs = Date.now();
+    slotStates[currentSlotKey].endTs = null;
+
+    slotStates[currentSlotKey].started = true;
+    slotStates[currentSlotKey].finished = false;
+  }
+
+  if (timerInterval !== null) return;
+
+  if (!slotStates[currentSlotKey].startTs) slotStates[currentSlotKey].startTs = Date.now();
+  slotStates[currentSlotKey].endTs = null;
+  slotStates[currentSlotKey].timerRunning = true;
+
+  timerInterval = setInterval(() => {
+    timerSeconds++;
+    renderTimer();
+    ensureSlotInitialized(currentSlotKey);
+    slotStates[currentSlotKey].timerSeconds = timerSeconds;
+  }, 1000);
+
+  updateButtonsState();
+}
+
+startTimerBtn.addEventListener("click", () => {
+  ensureSlotInitialized(currentSlotKey);
+  if (!slotStates[currentSlotKey].started) {
+    alert("Önce 'FARMI BAŞLAT' butonuna basmalısın.");
+    return;
+  }
+  startTimerInternal(false);
+});
+
+pauseTimerBtn.addEventListener("click", () => {
+  pauseTimerInternal();
+  ensureSlotInitialized(currentSlotKey);
+  slotStates[currentSlotKey].timerSeconds = timerSeconds;
+  updateButtonsState();
+});
+
+resetTimerBtn.addEventListener("click", () => {
+  pauseTimerInternal();
+  timerSeconds = 0;
+  renderTimer();
+  ensureSlotInitialized(currentSlotKey);
+  slotStates[currentSlotKey].timerSeconds = 0;
+  slotStates[currentSlotKey].startTs = null;
+  slotStates[currentSlotKey].endTs = null;
+  slotStates[currentSlotKey].timerRunning = false;
+  updateButtonsState();
+});
+
+startFarmBtn.addEventListener("click", () => {
+  ensureSlotInitialized(currentSlotKey);
+
+  if (slotStates[currentSlotKey].timerRunning) {
+    openStartFarmConfirm();
+    return;
+  }
+
+  startTimerInternal(true);
+  updateTimerButtonsUI();
+});
+
+/* Tarih & saat */
+function updateDateTime() {
+  const now = new Date();
+  const d = now.toLocaleDateString("tr-TR");
+  const t = now.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+  dateTimeTextEl.textContent = `${d} • ${t}`;
+}
+updateDateTime();
+setInterval(updateDateTime, 1000);
+
+/* RESET buttons */
+resetSlotBtn.addEventListener("click", () => {
+  pauseTimerInternal();
+  clearDOMValues();
+  timerSeconds = 0;
+  renderTimer();
+  recalc(false);
+
+  if (currentSlotKey) {
+    slotStates[currentSlotKey] = {
+      barsQty: [0,0,0],
+      items: [],
+      partySize: 1,
+      timerSeconds: 0,
+      timerRunning: false,
+      startTs: null,
+      endTs: null,
+      started: false,
+      finished: false,
+      totals: { barsTotal: 0, itemsTotal: 0, grandTotal: 0, partySize: 1, perPerson: 0, barsDetails: [], itemsDetails: [] },
+      participants: [],
+      dist: { bars:false, items:false }
+    };
+    syncPartySizeFromParticipants(currentSlotKey, true);
+  }
+  updateButtonsState();
+});
+
+resetAllBtn.addEventListener("click", () => {
+  pauseTimerInternal();
+  for (const key of Object.keys(slotStates)) delete slotStates[key];
+
+  clearDOMValues();
+  timerSeconds = 0;
+  renderTimer();
+  recalc(false);
+
+  currentBase="default"; currentNum="1"; currentSlotKey=getCompositeKey(currentBase,currentNum);
+  ensureSlotInitialized(currentSlotKey);
+
+  setSlotBase("default");
+  setSlotNum("1");
+  applyStateToDOM(slotStates[currentSlotKey]);
+  updateButtonsState();
+});
+
+/* ================== Participants Popups ================== */
+function openParticipantsListPopup() {
+  ensureSlotInitialized(currentSlotKey);
+  const list = getSlotParticipants(currentSlotKey);
+  if (list.length === 0) {
+    pListContent.innerHTML = `Bu slotta katılımcı yok.`;
+  } else {
+    pListContent.innerHTML = list.map((n, i) => `${i+1}) ${escapeHtml(n)}`).join("<br>");
+  }
+  pListOverlay.style.display = "flex";
+  pListOverlay.setAttribute("aria-hidden", "false");
+}
+function closeParticipantsListPopup() {
+  pListOverlay.style.display = "none";
+  pListOverlay.setAttribute("aria-hidden", "true");
+}
+function openParticipantsEditPopup() {
+  ensureSlotInitialized(currentSlotKey);
+  const list = getSlotParticipants(currentSlotKey);
+  pEditTextarea.value = list.join("\n");
+  pEditOverlay.style.display = "flex";
+  pEditOverlay.setAttribute("aria-hidden", "false");
+  setTimeout(() => pEditTextarea.focus(), 0);
+}
+function closeParticipantsEditPopup() {
+  pEditOverlay.style.display = "none";
+  pEditOverlay.setAttribute("aria-hidden", "true");
+}
+
+participantsBtn.addEventListener("click", () => { saveCurrentSlotState(); openParticipantsListPopup(); });
+editParticipantsBtn.addEventListener("click", () => { saveCurrentSlotState(); openParticipantsEditPopup(); });
+
+pListClose.addEventListener("click", closeParticipantsListPopup);
+pEditClose.addEventListener("click", closeParticipantsEditPopup);
+pEditCancel.addEventListener("click", closeParticipantsEditPopup);
+
+pEditSave.addEventListener("click", () => {
+  const cleaned = sanitizeParticipantsFromText(pEditTextarea.value);
+  setCurrentParticipants(cleaned);
+  saveCurrentSlotState();
+  closeParticipantsEditPopup();
+});
+
+pListOverlay.addEventListener("click", (e) => { if (e.target === pListOverlay) closeParticipantsListPopup(); });
+pEditOverlay.addEventListener("click", (e) => { if (e.target === pEditOverlay) closeParticipantsEditPopup(); });
+
+/* ================== Farm Summary Participants Popup (Finish Summary) ================== */
+function openSummaryParticipantsPopup(slotKey) {
+  ensureSlotInitialized(slotKey);
+  const state = slotStates[slotKey];
+  const { base, num } = parseCompositeKey(slotKey);
+  const label = `${(SLOT_LABELS[base] || "SLOT")} ${num}`.toUpperCase();
+
+  const t = state.totals || { barsTotal:0, itemsTotal:0, grandTotal:0 };
+  const participants = Array.isArray(state.participants) ? state.participants : [];
+  const pCount = participants.length;
+
+  const totalPay = (pCount > 0) ? (t.grandTotal / pCount) : 0;
+  const barPay   = (pCount > 0) ? (t.barsTotal / pCount) : 0;
+  const itemPay  = (pCount > 0) ? (t.itemsTotal / pCount) : 0;
+
+  pSummaryTitle.textContent = `${label} • KATILIMCI DETAYLARI`;
+
+  if (pCount === 0) {
+    pSummaryContent.innerHTML = `Bu slotta katılımcı eklenmemiş.`;
+  } else {
+    const header = `
+      <div style="margin-bottom:8px;">
+        <div class="summary-line">Katılımcı Sayısı: <strong>${pCount}</strong></div>
+        <div class="summary-line">Kişi Başı Toplam: <strong class="sum-gold">${totalPay.toFixed(2)} GB</strong></div>
+        ${barPay>0 ? `<div class="summary-line">Bar Payı (Kişi Başı): <strong>${barPay.toFixed(2)} GB</strong></div>` : ""}
+        ${itemPay>0 ? `<div class="summary-line">İtem Payı (Kişi Başı): <strong>${itemPay.toFixed(2)} GB</strong></div>` : ""}
+      </div>
+      <hr style="border:none;border-top:1px solid rgba(148,163,184,0.35);margin:8px 0;">
+    `;
+    const listHtml = participants.map((n, i) => {
+      const lines = [];
+      lines.push(`<div class="summary-line">${i+1}) <strong>${escapeHtml(n)}</strong></div>`);
+      if (barPay > 0)  lines.push(`<div class="summary-line" style="padding-left:12px;">Bar Payı: <strong>${barPay.toFixed(2)} GB</strong></div>`);
+      if (itemPay > 0) lines.push(`<div class="summary-line" style="padding-left:12px;">İtem Payı: <strong>${itemPay.toFixed(2)} GB</strong></div>`);
+      return `<div style="margin-bottom:8px;">${lines.join("")}</div>`;
+    }).join("");
+
+    pSummaryContent.innerHTML = header + listHtml;
+  }
+
+  pSummaryOverlay.style.display = "flex";
+  pSummaryOverlay.setAttribute("aria-hidden", "false");
+}
+function closeSummaryParticipantsPopup() {
+  pSummaryOverlay.style.display = "none";
+  pSummaryOverlay.setAttribute("aria-hidden", "true");
+}
+pSummaryClose.addEventListener("click", closeSummaryParticipantsPopup);
+pSummaryOverlay.addEventListener("click", (e) => { if (e.target === pSummaryOverlay) closeSummaryParticipantsPopup(); });
+
+/* ================== FARM ÖZETİ (Finish) ================== */
+function makeStickyTitle(labelUpper) {
+  return `
+    <div class="slot-sticky">
+      <div class="summary-group-title">${labelUpper}</div>
+      <div class="slot-sticky-divider"></div>
+    </div>
+  `;
+}
+summaryScroll.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-slot-participants]");
+  if (!btn) return;
+  const key = btn.getAttribute("data-slot-participants");
+  if (!key) return;
+  openSummaryParticipantsPopup(key);
+});
+closeSummaryBtn.addEventListener("click", () => { summaryOverlay.style.display = "none"; });
+
+finishBtn.addEventListener("click", () => {
+  ensureSlotInitialized(currentSlotKey);
+
+  if (!slotStates[currentSlotKey].started){
+    alert("Önce 'FARMI BAŞLAT' butonuna basmalısın.");
+    updateButtonsState();
+    return;
+  }
+
+  pauseTimerInternal();
+
+  slotStates[currentSlotKey].endTs = Date.now();
+  slotStates[currentSlotKey].timerRunning = false;
+  slotStates[currentSlotKey].finished = true;
+
+  if (!slotStates[currentSlotKey].startTs && timerSeconds > 0) {
+    slotStates[currentSlotKey].startTs = Date.now() - (timerSeconds * 1000);
+  }
+
+  saveCurrentSlotState();
+  recalc();
+
+  let scrollHtml = "";
+  let fixedHtml  = "";
+  let overallTotal = 0;
+  let overallBarsTotal = 0;
+  let overallItemsTotal = 0;
+  let overallTimeSeconds = 0;
+
+  let anySlot = false;
+  const keys = Object.keys(slotStates);
+
+  const includedSlotPartyCounts = [];
+
+  for (const key of keys) {
+    const state = slotStates[key];
+    if (!state || !state.totals) continue;
+
+    const { base, num } = parseCompositeKey(key);
+    const label = `${SLOT_LABELS[base] || "SLOT"} ${num}`;
+    const t = state.totals;
+
+    const slotTimeSeconds = state.timerSeconds || 0;
+    if (t.barsTotal === 0 && t.itemsTotal === 0 && slotTimeSeconds === 0) continue;
+
+    anySlot = true;
+    overallTotal += t.grandTotal;
+    overallBarsTotal += t.barsTotal;
+    overallItemsTotal += t.itemsTotal;
+    overallTimeSeconds += slotTimeSeconds;
+
+    const pCount = (state.participants && state.participants.length) ? state.participants.length : 0;
+    includedSlotPartyCounts.push(pCount);
+
+    const startTs = state.startTs || null;
+    const endTs   = state.endTs   || null;
+
+    const farmTimeLine = (startTs && endTs)
+      ? `Farm Zamanı: <strong>${formatShortDate(startTs)}</strong> • <strong>${formatHM(startTs)}-${formatHM(endTs)}</strong>`
+      : (startTs && !endTs)
+        ? `Farm Zamanı: <strong>${formatShortDate(startTs)}</strong> • <strong>${formatHM(startTs)}--:--</strong>`
+        : `Farm Zamanı: <strong>--</strong>`;
+
+    scrollHtml += makeStickyTitle(label.toUpperCase());
+
+    scrollHtml += `<div class="summary-line">Barlar Toplamı: <strong>${t.barsTotal.toFixed(2)} GB</strong></div>`;
+    scrollHtml += `<div class="summary-line">İtemler Toplamı: <strong>${t.itemsTotal.toFixed(2)} GB</strong></div>`;
+    scrollHtml += `<div class="summary-line">Genel Toplam: <strong class="sum-gold">${t.grandTotal.toFixed(2)} GB</strong></div>`;
+    scrollHtml += `<div class="summary-line">${farmTimeLine}</div>`;
+    scrollHtml += `<div class="summary-line">Farm Süresi: <strong>${formatSecondsToTime(slotTimeSeconds)}</strong></div>`;
+
+    if (t.barsDetails && t.barsDetails.length > 0) {
+      scrollHtml += `<div class="summary-line" style="margin-top:6px;"><strong>Bar Detayları:</strong></div>`;
+      t.barsDetails.forEach(d => {
+        scrollHtml += `<div class="summary-line">• ${escapeHtml(d.name)}: ${d.qty} adet × ${d.price.toFixed(2)} = <strong>${d.total.toFixed(2)} GB</strong></div>`;
+      });
+    }
+
+    if (t.itemsDetails && t.itemsDetails.length > 0) {
+      scrollHtml += `<div class="summary-line" style="margin-top:6px;"><strong>İtem Detayları:</strong></div>`;
+      t.itemsDetails.forEach(d => {
+        scrollHtml += `<div class="summary-line">• ${escapeHtml(d.name)}: ${d.qty} adet × ${d.price.toFixed(2)} = <strong>${d.total.toFixed(2)} GB</strong></div>`;
+      });
+    }
+
+    scrollHtml += `<button class="btn-slot-participants" data-slot-participants="${key}">KATILIMCI DETAYLARI</button>`;
+    scrollHtml += `<hr style="border:none;border-top:1px solid rgba(148,163,184,0.35);margin:10px 0;">`;
+  }
+
+  if (!anySlot) {
+    scrollHtml = `<div style="margin-top:6px; padding: 0 6px 0 10px;">Kayıtlı bir drop yok. 😅</div>`;
+    fixedHtml = "";
+  } else {
+    const uniqueCounts = uniq(includedSlotPartyCounts.map(x => String(x || 0)));
+    const showOverallPerPerson = (uniqueCounts.length === 1);
+
+    fixedHtml += `
+      <div class="overall-box">
+        <div class="overall-title">GENEL TOPLAM (TÜM SLOTLAR)</div>
+        <div class="overall-content">
+          <div class="summary-line">Toplam Gelir:
+            <strong class="overall-gold">${overallTotal.toFixed(2)} GB</strong>
+          </div>
+          <div class="summary-line" style="margin-top:2px;">Bar Geliri: <strong>${overallBarsTotal.toFixed(2)} GB</strong></div>
+          <div class="summary-line" style="margin-top:2px;">İtem Geliri: <strong>${overallItemsTotal.toFixed(2)} GB</strong></div>
+    `;
+
+    if (showOverallPerPerson) {
+      const overallParty = Math.max(1, parseInt(uniqueCounts[0], 10) || 0);
+      const overallPerPerson = overallParty > 0 ? overallTotal / overallParty : 0;
+      const overallPerBars   = overallParty > 0 ? overallBarsTotal / overallParty : 0;
+      const overallPerItems  = overallParty > 0 ? overallItemsTotal / overallParty : 0;
+
+      fixedHtml += `
+          <div class="summary-line" style="margin-top:6px;">Kişi Başı Gelir:
+            <strong class="overall-per">${overallPerPerson.toFixed(2)} GB</strong>
+          </div>
+          <div class="summary-line" style="margin-top:2px;">Bar Geliri (Kişi Başı): <strong>${overallPerBars.toFixed(2)} GB</strong></div>
+          <div class="summary-line" style="margin-top:2px;">İtem Geliri (Kişi Başı): <strong>${overallPerItems.toFixed(2)} GB</strong></div>
+      `;
+    }
+
+    fixedHtml += `
+          <div class="overall-divider"></div>
+          <div class="overall-time-title">TOPLAM FARM SÜRESİ</div>
+          <div class="overall-time-value">${formatSecondsToTime(overallTimeSeconds)}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  summaryScroll.innerHTML = scrollHtml;
+  summaryFixed.innerHTML  = fixedHtml;
+
+  summaryOverlay.style.display = "flex";
+
+  updateButtonsState();
+});
+
+/* ================== SUMMARY OVERLAY close (click outside) ================== */
+summaryOverlay.addEventListener("click", (e) => {
+  if (e.target === summaryOverlay) summaryOverlay.style.display = "none";
+});
+
+/* ================== SAVE / HISTORY STORAGE ================== */
+const LS_HISTORY_KEY = "magical_farm_history_v2";
+
+function loadHistory(){
+  try{
+    const raw = localStorage.getItem(LS_HISTORY_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  }catch(_){
+    return [];
+  }
+}
+function saveHistory(arr){
+  localStorage.setItem(LS_HISTORY_KEY, JSON.stringify(arr || []));
+}
+
+function makeRecordId(){
+  return "rec_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2,7);
+}
+
+function buildRecordFromSlot(slotKey){
+  ensureSlotInitialized(slotKey);
+  const st = slotStates[slotKey];
+  const { base, num } = parseCompositeKey(slotKey);
+
+  const slotLabel = SLOT_LABELS[base] || "SLOT";
+  const titleName = `${formatShortDate(st.startTs || Date.now())} ${slotLabel} ${num}`;
+
+  const startTs = st.startTs || null;
+  const endTs   = st.endTs   || null;
+
+  const participants = Array.isArray(st.participants) ? st.participants.slice(0) : [];
+  const t = st.totals || { barsTotal:0, itemsTotal:0, grandTotal:0, barsDetails:[], itemsDetails:[], partySize:1, perPerson:0 };
+
+  // kişi bazlı dağıtım (her katılımcı için ayrı)
+  const dist = participants.map(name => ({ name, bars:false, items:false }));
+
+  return {
+    id: makeRecordId(),
+    slotKey,
+    base,
+    num,
+    slotLabel,
+    titleName,
+    startTs,
+    endTs,
+    timeSeconds: st.timerSeconds || 0,
+    totals: {
+      barsTotal: Number(t.barsTotal || 0),
+      itemsTotal: Number(t.itemsTotal || 0),
+      grandTotal: Number(t.grandTotal || 0),
+      barsDetails: Array.isArray(t.barsDetails) ? safeClone(t.barsDetails) : [],
+      itemsDetails: Array.isArray(t.itemsDetails) ? safeClone(t.itemsDetails) : [],
+    },
+    participants,
+    dist, // [{name, bars, items}]
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+}
+
+/* ================== SAVE PREVIEW (FARMI KAYDET) ================== */
+function openSavePreview(){
+  const keys = Object.keys(slotStates).filter(k => isSlotFinishedAndNonEmpty(slotStates[k]));
+  if (keys.length === 0){
+    alert("Kaydedilecek bitmiş slot yok.");
+    return;
+  }
+
+  let html = "";
+  let overallTotal = 0;
+  let overallBarsTotal = 0;
+  let overallItemsTotal = 0;
+  let overallTimeSeconds = 0;
+
+  const partyCounts = [];
+
+  keys.forEach((k) => {
+    const st = slotStates[k];
+    const { base, num } = parseCompositeKey(k);
+    const label = `${SLOT_LABELS[base] || "SLOT"} ${num}`.toUpperCase();
+
+    const t = st.totals || {};
+    const pCount = (st.participants && st.participants.length) ? st.participants.length : 0;
+    partyCounts.push(pCount);
+
+    overallTotal += Number(t.grandTotal || 0);
+    overallBarsTotal += Number(t.barsTotal || 0);
+    overallItemsTotal += Number(t.itemsTotal || 0);
+    overallTimeSeconds += Number(st.timerSeconds || 0);
+
+    const startTs = st.startTs || null;
+    const endTs   = st.endTs   || null;
+
+    const farmTimeLine = (startTs && endTs)
+      ? `${formatShortDate(startTs)} • ${formatHM(startTs)}-${formatHM(endTs)}`
+      : (startTs && !endTs)
+        ? `${formatShortDate(startTs)} • ${formatHM(startTs)}--:--`
+        : `--`;
+
+    html += `
+      <div class="s-sticky">
+        <div class="tt">${label}</div>
+        <div class="s-subtitle">${escapeHtml(farmTimeLine)} • ${pCount || 0} kişi</div>
+      </div>
+
+      <div class="s-line">Toplam Farm: <strong class="gold">${Number(t.grandTotal||0).toFixed(2)} GB</strong></div>
+      <div class="s-line">Bar Toplamı: <strong>${Number(t.barsTotal||0).toFixed(2)} GB</strong></div>
+      <div class="s-line">İtem Toplamı: <strong>${Number(t.itemsTotal||0).toFixed(2)} GB</strong></div>
+      <div class="s-line">Farm Süresi: <strong>${formatSecondsToTime(st.timerSeconds||0)}</strong></div>
+
+      <hr style="border:none;border-top:1px solid rgba(148,163,184,0.35);margin:10px 0;">
+    `;
+  });
+
+  const uniqCounts = uniq(partyCounts.map(x => String(x || 0)));
+  const showOverallPer = (uniqCounts.length === 1);
+
+  let overallHtml = `
+    <div class="s-sticky">
+      <div class="tt">GENEL TOPLAM (TÜM SLOTLAR)</div>
+      <div class="s-subtitle">${formatSecondsToTime(overallTimeSeconds)} toplam süre</div>
+    </div>
+
+    <div class="s-line">Toplam Gelir: <strong class="gold">${overallTotal.toFixed(2)} GB</strong></div>
+    <div class="s-line">Bar Geliri: <strong>${overallBarsTotal.toFixed(2)} GB</strong></div>
+    <div class="s-line">İtem Geliri: <strong>${overallItemsTotal.toFixed(2)} GB</strong></div>
+  `;
+
+  if (showOverallPer){
+    const p = Math.max(1, parseInt(uniqCounts[0],10) || 1);
+    overallHtml += `
+      <div class="s-line" style="margin-top:6px;">Kişi Başı Gelir: <strong class="gold">${(overallTotal/p).toFixed(2)} GB</strong></div>
+      <div class="s-line">Bar (Kişi Başı): <strong>${(overallBarsTotal/p).toFixed(2)} GB</strong></div>
+      <div class="s-line">İtem (Kişi Başı): <strong>${(overallItemsTotal/p).toFixed(2)} GB</strong></div>
+    `;
+  }
+
+  saveBody.innerHTML = overallHtml + `<hr style="border:none;border-top:1px solid rgba(148,163,184,0.35);margin:10px 0;">` + html;
+
+  saveOverlay.style.display = "flex";
+  saveOverlay.setAttribute("aria-hidden", "false");
+}
+function closeSavePreview(){
+  saveOverlay.style.display = "none";
+  saveOverlay.setAttribute("aria-hidden", "true");
+}
+
+saveFarmBtn.addEventListener("click", () => {
+  saveCurrentSlotState();
+  openSavePreview();
+});
+
+saveClose.addEventListener("click", closeSavePreview);
+saveCancelBtn.addEventListener("click", closeSavePreview);
+saveOverlay.addEventListener("click", (e) => { if (e.target === saveOverlay) closeSavePreview(); });
+
+/* ✅✅✅ FIX: Kaydetme filtreden etkilenmez */
+saveConfirmBtn.addEventListener("click", () => {
+  const keys = Object.keys(slotStates).filter(k => isSlotFinishedAndNonEmpty(slotStates[k]));
+  if (keys.length === 0){
+    alert("Kaydedilecek bitmiş slot yok.");
+    closeSavePreview();
+    return;
+  }
+
+  const history = loadHistory(); // filtre yok
+  const newRecords = keys.map(k => buildRecordFromSlot(k));
+  const merged = newRecords.concat(history);
+  saveHistory(merged);
+
+  closeSavePreview();
+  renderHistoryList();
+  showToast("Kaydedildi ✅", "ok", "FARM KAYDI");
+});
+
+/* ================== ✅✅ NEW: TARİH FİLTRE STATE ================== */
+/* from/to ISO: YYYY-MM-DD (ikisi de null olabilir) */
+let historyDateFilter = { from:null, to:null };
+
+function pad2(n){ return String(n).padStart(2,"0"); }
+
+function toIsoLocalDate(d){
+  const y = d.getFullYear();
+  const m = pad2(d.getMonth()+1);
+  const day = pad2(d.getDate());
+  return `${y}-${m}-${day}`;
+}
+
+function isoToDisplay(iso){
+  if (!iso) return "--.--.----";
+  const [y,m,d] = String(iso).split("-");
+  if (!y || !m || !d) return "--.--.----";
+  return `${d}.${m}.${y}`;
+}
+
+/* GG.AA.YYYY veya YYYY-MM-DD kabul */
+function parseUserDateToIso(txt){
+  const s = String(txt||"").trim();
+  if (!s) return null;
+
+  // YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+
+  // GG.AA.YYYY veya GG/AA/YYYY
+  const m = s.match(/^(\d{1,2})[.\-/](\d{1,2})[.\-/](\d{4})$/);
+  if (!m) return null;
+
+  const dd = parseInt(m[1],10);
+  const mm = parseInt(m[2],10);
+  const yy = parseInt(m[3],10);
+
+  if (!(yy>=1970 && yy<=2100)) return null;
+  if (!(mm>=1 && mm<=12)) return null;
+  if (!(dd>=1 && dd<=31)) return null;
+
+  const d = new Date(yy, mm-1, dd);
+  // geçersiz günleri ele (31 Şubat gibi)
+  if (d.getFullYear()!==yy || (d.getMonth()+1)!==mm || d.getDate()!==dd) return null;
+
+  return toIsoLocalDate(d);
+}
+
+function normalizeFilter(){
+  const f = historyDateFilter || {from:null,to:null};
+  let from = f.from || null;
+  let to   = f.to   || null;
+
+  if (from && to && from > to){
+    const tmp = from; from = to; to = tmp;
+  }
+  historyDateFilter = { from, to };
+}
+
+function updateHistoryFilterBar(){
+  normalizeFilter();
+  const { from, to } = historyDateFilter;
+
+  if (!from && !to){
+    historyFilterBar?.classList.remove("show");
+    return;
+  }
+
+  let text = "";
+  if (from && !to){
+    text = `FİLTRE: ${isoToDisplay(from)}`;
+  } else if (!from && to){
+    text = `FİLTRE: ${isoToDisplay(to)}`;
+  } else {
+    text = `FİLTRE: ${isoToDisplay(from)} – ${isoToDisplay(to)}`;
+  }
+
+  if (historyFilterText) historyFilterText.textContent = text;
+  historyFilterBar?.classList.add("show");
+}
+
+function clearHistoryFilter(){
+  historyDateFilter = { from:null, to:null };
+  if (dfFrom) dfFrom.value = "";
+  if (dfTo) dfTo.value = "";
+  updateHistoryFilterBar();
+  renderHistoryList();
+}
+
+if (historyFilterClear){
+  historyFilterClear.addEventListener("click", () => clearHistoryFilter());
+}
+
+/* popup open/close */
+function openDateFilterPopup(){
+  normalizeFilter();
+  dfFrom.value = historyDateFilter.from ? isoToDisplay(historyDateFilter.from) : "";
+  dfTo.value   = historyDateFilter.to   ? isoToDisplay(historyDateFilter.to)   : "";
+  dateFilterOverlay.style.display = "flex";
+  dateFilterOverlay.setAttribute("aria-hidden","false");
+  setTimeout(() => dfFrom?.focus(), 0);
+}
+function closeDateFilterPopup(){
+  dateFilterOverlay.style.display = "none";
+  dateFilterOverlay.setAttribute("aria-hidden","true");
+}
+
+if (historyDateBtn){
+  historyDateBtn.addEventListener("click", () => openDateFilterPopup());
+}
+if (dateFilterClose) dateFilterClose.addEventListener("click", closeDateFilterPopup);
+if (dateFilterOverlay){
+  dateFilterOverlay.addEventListener("click", (e) => {
+    if (e.target === dateFilterOverlay) closeDateFilterPopup();
+  });
+}
+
+/* quick buttons */
+if (dfToday){
+  dfToday.addEventListener("click", () => {
+    const iso = toIsoLocalDate(new Date());
+    dfFrom.value = isoToDisplay(iso);
+    dfTo.value = "";
+  });
+}
+if (df7){
+  df7.addEventListener("click", () => {
+    const now = new Date();
+    const to = toIsoLocalDate(now);
+    const fromD = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);
+    const from = toIsoLocalDate(fromD);
+    dfFrom.value = isoToDisplay(from);
+    dfTo.value = isoToDisplay(to);
+  });
+}
+
+/* apply / clear */
+if (dfClear){
+  dfClear.addEventListener("click", () => {
+    clearHistoryFilter();
+    closeDateFilterPopup();
+    showToast("Filtre temizlendi ✕", "warn", "FİLTRE");
+  });
+}
+
+if (dfApply){
+  dfApply.addEventListener("click", () => {
+    const fromIso = parseUserDateToIso(dfFrom.value);
+    const toIso   = parseUserDateToIso(dfTo.value);
+
+    if (dfFrom.value.trim() && !fromIso){
+      showToast("Başlangıç tarihi hatalı (GG.AA.YYYY)", "err", "FİLTRE");
+      return;
+    }
+    if (dfTo.value.trim() && !toIso){
+      showToast("Bitiş tarihi hatalı (GG.AA.YYYY)", "err", "FİLTRE");
+      return;
+    }
+
+    historyDateFilter = { from: fromIso, to: toIso };
+    normalizeFilter();
+    updateHistoryFilterBar();
+    renderHistoryList();
+    closeDateFilterPopup();
+
+    showToast("Filtre uygulandı ✅", "ok", "FİLTRE");
+  });
+}
+
+/* ================== HISTORY LIST ================== */
+function openHistory(){
+  updateHistoryFilterBar();
+  renderHistoryList();
+  historyOverlay.style.display = "flex";
+  historyOverlay.setAttribute("aria-hidden","false");
+}
+function closeHistory(){
+  historyOverlay.style.display = "none";
+  historyOverlay.setAttribute("aria-hidden","true");
+}
+
+farmHistoryBtn.addEventListener("click", openHistory);
+historyClose.addEventListener("click", closeHistory);
+historyOverlay.addEventListener("click", (e) => { if (e.target === historyOverlay) closeHistory(); });
+
+/* ✅✅✅ FIX + ✅✅ FILTER: Liste sadece seçili gün / aralığı gösterir */
+function renderHistoryList(){
+  normalizeFilter();
+  let history = loadHistory();
+
+  // ✅ filtre uygula (sadece görüntü)
+  const { from, to } = historyDateFilter;
+  if (from || to){
+    history = history.filter(rec => {
+      if (!rec.startTs) return false;
+      const d = new Date(rec.startTs);
+      const key = toIsoLocalDate(d); // YYYY-MM-DD
+
+      if (from && !to) return key === from;
+      if (!from && to) return key === to;
+      return key >= from && key <= to;
+    });
+  }
+
+  if (history.length === 0){
+    historyBody.innerHTML = `<div style="opacity:.9; padding:8px;">Henüz kayıt yok.</div>`;
+    return;
+  }
+
+  historyBody.innerHTML = history.map(rec => {
+    const start  = rec.startTs ? formatHM(rec.startTs) : "--:--";
+    const end    = rec.endTs   ? formatHM(rec.endTs)   : "--:--";
+
+    const participantsArr = Array.isArray(rec.participants) ? rec.participants : [];
+    const pCount = participantsArr.length;
+
+    const meta = `${start}-${end} • ${pCount} kişi • <span class="h-gold">${Number(rec.totals?.grandTotal||0).toFixed(2)} GB</span>`;
+
+    // ✅ KURAL: 2+ kişi varsa ikon göster
+    const shouldShowPayStatus = pCount > 1;
+
+    // dist yoksa eski kayıt olabilir: ikon gösterilecekse "eksik" say
+    const distArr = Array.isArray(rec.dist) ? rec.dist : [];
+
+    const allPaid = shouldShowPayStatus
+      && distArr.length === pCount
+      && distArr.every(d => d && d.bars === true && d.items === true);
+
+    const statusIcon = !shouldShowPayStatus ? `` : (
+      allPaid
+        ? `
+          <div class="h-status ok" title="Paylar tamamlandı" aria-label="Paylar tamamlandı">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 6L9 17l-5-5"></path>
+            </svg>
+          </div>
+        `
+        : `
+          <div class="h-status no" title="Paylar eksik" aria-label="Paylar eksik">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round">
+              <path d="M18 6L6 18"></path>
+              <path d="M6 6l12 12"></path>
+            </svg>
+          </div>
+        `
+    );
+
+    return `
+      <div class="h-btn" data-open="${escapeHtml(rec.id)}">
+        <div class="h-content">
+          <div class="h-name">${escapeHtml(rec.titleName || "Kayıt")}</div>
+          <div class="h-meta">${meta}</div>
+        </div>
+
+        ${statusIcon}
+
+        <button class="h-trash" data-del="${escapeHtml(rec.id)}" title="Sil" aria-label="Sil">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6l-1 14H6L5 6"></path>
+            <path d="M10 11v6"></path>
+            <path d="M14 11v6"></path>
+          </svg>
+        </button>
+      </div>
+    `;
+  }).join("");
+}
+
+// history list click delegation
+historyBody.addEventListener("click", (e) => {
+  const delBtn = e.target.closest("[data-del]");
+  if (delBtn){
+    const id = delBtn.getAttribute("data-del");
+    if (!id) return;
+    const history = loadHistory().filter(r => r.id !== id);
+    saveHistory(history);
+    renderHistoryList();
+    return;
+  }
+
+  const openBtn = e.target.closest("[data-open]");
+  if (openBtn){
+    const id = openBtn.getAttribute("data-open");
+    if (!id) return;
+    openHistoryDetail(id);
+  }
+});
+
+/* ================== HISTORY DETAIL (KAYIT DETAYI) ================== */
+let currentDetailId = null;
+
+function openHistoryDetail(id){
+  const history = loadHistory();
+  const rec = history.find(r => r.id === id);
+  if (!rec){
+    alert("Kayıt bulunamadı.");
+    return;
+  }
+  currentDetailId = id;
+
+  historyDetailTitleTop.textContent = "KAYIT DETAYI";
+historyDetailTitleSub.textContent = "";
+
+
+  const startLine = (rec.startTs && rec.endTs)
+    ? `${formatShortDate(rec.startTs)} • ${formatHM(rec.startTs)}-${formatHM(rec.endTs)}`
+    : (rec.startTs ? `${formatShortDate(rec.startTs)} • ${formatHM(rec.startTs)}--:--` : `--`);
+
+  const t = rec.totals || {};
+  const pCount = (rec.participants && rec.participants.length) ? rec.participants.length : 0;
+
+  const perTotal = pCount > 0 ? (Number(t.grandTotal||0) / pCount) : 0;
+  const perBars  = pCount > 0 ? (Number(t.barsTotal||0) / pCount) : 0;
+  const perItems = pCount > 0 ? (Number(t.itemsTotal||0) / pCount) : 0;
+
+  const distArr = Array.isArray(rec.dist) ? rec.dist : [];
+  const rows = distArr.map((d, idx) => `
+    <div class="dist-row">
+      <div class="dist-name">${idx+1}) ${escapeHtml(d.name || "")}</div>
+      <div class="dist-cell">
+        <input class="s-check" type="checkbox" data-dist="bars" data-i="${idx}" ${d.bars ? "checked":""} />
+      </div>
+      <div class="dist-cell">
+        <input class="s-check" type="checkbox" data-dist="items" data-i="${idx}" ${d.items ? "checked":""} />
+      </div>
+    </div>
+  `).join("");
+
+  historyDetailBody.innerHTML = `
+    <div class="s-sticky">
+      <div class="tt">${escapeHtml((rec.slotLabel || "SLOT").toUpperCase())} ${escapeHtml(rec.num || "")}</div>
+      <div class="s-subtitle">${escapeHtml(startLine)} • ${pCount} kişi</div>
+    </div>
+
+    <div class="s-line">Farm Süresi: <strong>${formatSecondsToTime(rec.timeSeconds || 0)}</strong></div>
+    <div class="s-line">Toplam Farm: <strong class="gold">${Number(t.grandTotal||0).toFixed(2)} GB</strong></div>
+    <div class="s-line">Bar Toplamı: <strong>${Number(t.barsTotal||0).toFixed(2)} GB</strong></div>
+    <div class="s-line">İtem Toplamı: <strong>${Number(t.itemsTotal||0).toFixed(2)} GB</strong></div>
+
+    <div class="s-line" style="margin-top:8px;">Katılımcı: <strong>${pCount}</strong></div>
+    <div class="s-line">Kişi Başı Bar: <strong class="gold">${perBars.toFixed(2)} GB</strong></div>
+    <div class="s-line">Kişi Başı İtem: <strong class="gold">${perItems.toFixed(2)} GB</strong></div>
+    <div class="s-line">Kişi Başı Toplam: <strong class="gold">${perTotal.toFixed(2)} GB</strong></div>
+
+    <div class="s-people">
+  <div class="phead" style="justify-content:center;">
+    <span style="
+      font-weight:900;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color:#bfdbfe;
+      text-align:center;
+    ">
+      KATILIMCILAR / PAY DURUMU
+    </span>
+  </div>
+
+  <div class="dist-head">
+  <div style="text-align:left; padding-left:25px;">KATILIMCI</div>
+    <div style="text-align:center;">GB</div>
+    <div style="text-align:center;">ITEM</div>
+  </div>
+
+
+      ${rows || `<div style="opacity:.9;">Katılımcı yok.</div>`}
+    </div>
+  `;
+
+  historyDetailOverlay.style.display = "flex";
+  historyDetailOverlay.setAttribute("aria-hidden","false");
+}
+
+function closeHistoryDetail(){
+  historyDetailOverlay.style.display = "none";
+  historyDetailOverlay.setAttribute("aria-hidden","true");
+  currentDetailId = null;
+}
+
+historyDetailClose.addEventListener("click", closeHistoryDetail);
+historyDetailOverlay.addEventListener("click", (e) => { if (e.target === historyDetailOverlay) closeHistoryDetail(); });
+
+// checkbox değişince local rec.dist güncelle (anlık)
+historyDetailBody.addEventListener("change", (e) => {
+  const cb = e.target;
+  if (!(cb instanceof HTMLInputElement)) return;
+  if (!cb.matches("input[type=checkbox][data-dist][data-i]")) return;
+  if (!currentDetailId) return;
+
+  const idx = parseInt(cb.getAttribute("data-i"), 10);
+  const kind = cb.getAttribute("data-dist");
+  if (!Number.isFinite(idx) || (kind !== "bars" && kind !== "items")) return;
+
+  const history = loadHistory();
+  const rec = history.find(r => r.id === currentDetailId);
+  if (!rec) return;
+
+  if (!Array.isArray(rec.dist)) rec.dist = [];
+  if (!rec.dist[idx]) return;
+
+  rec.dist[idx][kind] = !!cb.checked;
+  rec.updatedAt = Date.now();
+  saveHistory(history);
+});
+
+// Güncelle butonu
+historyDetailSaveBtn.addEventListener("click", () => {
+  if (!currentDetailId) return;
+
+  closeHistoryDetail();   // ✅ detay popup'ını kapat
+  openHistory();          // ✅ geçmiş listesine geri dön
+  showToast("Güncellendi ✅", "ok", "KAYIT");
+});
+
+// Sil butonu
+historyDetailDeleteBtn.addEventListener("click", () => {
+  if (!currentDetailId) return;
+  const id = currentDetailId;
+
+  const history = loadHistory().filter(r => r.id !== id);
+  saveHistory(history);
+
+  closeHistoryDetail();
+  renderHistoryList();
+});
+
+/* ================== WINDOW BUTTONS (Electron safe) ================== */
+const minBtn = document.getElementById("minBtn");
+const closeBtn = document.getElementById("closeBtn");
+if (minBtn) minBtn.addEventListener("click", () => {
+  try{ window.electronAPI?.minimize?.(); }catch(_){}
+});
+if (closeBtn) closeBtn.addEventListener("click", () => {
+  try{ window.electronAPI?.close?.(); }catch(_){}
+});
+
+/* ================== INIT ================== */
+function init(){
+  ensureSlotInitialized(currentSlotKey);
+  ensureMinItemRows();
+
+  initDropdowns();
+
+  syncPanelHeightVar();
+  setTimeout(syncPanelHeightVar, 50);
+
+  syncPartySizeFromParticipants(currentSlotKey, false);
+
+  updateHistoryFilterBar();
+  recalc(true);
+  updateButtonsState();
+}
+init();
+</script>
+
+</body>
+</html>
